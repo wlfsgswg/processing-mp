@@ -1,0 +1,156 @@
+/**
+ * Eric Meyer's Reset CSS v2.0 (http://meyerweb.com/eric/tools/css/reset/)
+ * http://cssreset.com
+ */
+.el-button .button-content {
+  font-size: 14px;
+}
+
+.el-table {
+  * {
+    font-size: 14px;
+  }
+}
+
+.el-descriptions__header {
+  display: inline-block !important;
+  width: 100%;
+  margin-bottom: 0 !important;
+}
+
+.reset-css,
+.main-index-public-class {
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  ul {
+    margin: 0;
+    font-size: 14px;
+  }
+
+  ul {
+    padding: 0;
+  }
+
+  table {
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
+
+  li {
+    list-style: none;
+  }
+}
+
+/* HTML5 display-role reset for older browsers */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+menu,
+nav,
+section {
+  display: block;
+}
+
+blockquote,
+q {
+  quotes: none;
+}
+
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* custom */
+
+a {
+  color: #7e8c8d;
+  -webkit-backface-visibility: hidden;
+  text-decoration: none;
+}
+
+li {
+  list-style: none;
+}
+
+body {
+  -webkit-text-size-adjust: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  line-height: 20px;
+  overflow: hidden;
+}
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  // line-height: 1;
+  // font-family: 'PingFang SC', 'STHeitiSC-Light', 'Helvetica-Light', arial, sans-serif, 'Droid Sans Fallback';
+  // user-select: none;
+  // font-size: 14px;
+  // overflow: hidden;
+  // color: #333;
+}
+
+// 重置公共组件dialog
+.xcx-components-dialog {
+  .components-dialog.el-dialog {
+    .el-dialog__header {
+      display: none;
+    }
+
+    .el-dialog__body {
+      padding: 0;
+
+      .components-dialog-top {
+        line-height: 22px;
+        font-weight: 600;
+        padding: 15px 16px 14px;
+        display: flex;
+        justify-content: space-between;
+        color: #000;
+        border-bottom: 1px solid #eee;
+
+        .svg-close_big {
+          height: 22px;
+
+          .close_big {
+            cursor: pointer;
+            padding: 2px 0;
+            width: 18px;
+            height: 18px;
+          }
+        }
+      }
+
+      .components-dialog-content {
+        padding: 24px 0 24px 40px;
+      }
+
+      .components-dialog-bottom {
+        padding: 15px 16px 16px;
+        border-top: 1px solid #eee;
+      }
+    }
+  }
+}
+
+.el-popover.guess-popconfirm {
+  .el-popconfirm__main {
+    padding-bottom: 10px;
+  }
+}

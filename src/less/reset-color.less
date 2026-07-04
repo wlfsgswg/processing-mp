@@ -1,0 +1,440 @@
+@import "./constant.less";
+
+// 输入框input
+.el-input:not(.is-disabled) {
+  .el-input__inner {
+    &:hover,
+    &:focus,
+    &:active {
+      border-color: @primary !important;
+    }
+
+    &:focus,
+    &:active {
+      outline: 2px solid @primaryBgc !important;
+    }
+  }
+}
+
+// 按钮button
+.el-button {
+  &.is-disabled {
+    opacity: 0.6 !important;
+  }
+
+  &.el-button--primary {
+    &,
+    &:hover,
+    &:active,
+    &:focus {
+      background-color: @primary !important;
+      border-color: @primary !important;
+    }
+  }
+
+  &.el-button--text {
+    &,
+    &:hover,
+    &:active,
+    &:focus {
+      color: @primary !important;
+    }
+
+    &.table-button--text {
+      &,
+      &:hover,
+      &:active,
+      &:focus {
+        color: #1063f2 !important;
+      }
+    }
+  }
+
+  &.el-button--default,
+  &.el-button--default.is-plain {
+    &:hover,
+    &:focus {
+      border-color: @primary !important;
+      color: @primary !important;
+      background-color: #fff !important;
+    }
+  }
+
+  &.el-button--default {
+    &:hover,
+    &:focus {
+      background-color: @primary !important;
+      color: #fff !important;
+      border-color: @primary !important;
+    }
+  }
+
+  &.is-plain {
+    &:hover,
+    &:focus {
+      border-color: @primary !important;
+      color: @primary !important;
+    }
+  }
+}
+
+// 下拉框
+.el-select {
+  &:focus-visible {
+    outline: none !important;
+  }
+
+  > div:not(.is-disabled) {
+    &:hover {
+      .el-input__inner {
+        border-color: @primary !important;
+      }
+    }
+  }
+
+  .el-input.is-focus .el-input__inner {
+    border-color: @primary;
+    outline: 2px solid @primaryBgc !important;
+  }
+}
+
+// 下拉框的选项卡
+.el-select-dropdown:not(.is-disabled) {
+  .el-scrollbar {
+    .el-select-dropdown__item {
+      &.hover,
+      &:hover,
+      &.selected {
+        background-color: @primaryBgc !important;
+      }
+    }
+  }
+}
+
+.el-scrollbar:not(.is-disabled) {
+  .el-select-dropdown {
+    .el-select-dropdown__item {
+      &.selected,
+      &:hover {
+        background-color: @primaryBgc !important;
+      }
+    }
+  }
+}
+
+// 时间选项框
+.el-date-editor:not(.is-disabled) {
+  &.el-range-editor {
+    &.is-active {
+      outline: @primaryBgc solid 2px !important;
+      border-color: @primary !important;
+
+      &:hover {
+        border-color: @primary !important;
+      }
+    }
+
+    &.el-input__inner {
+      &:hover {
+        border-color: @primary !important;
+      }
+    }
+  }
+}
+
+// 时间选项框弹出的日历选项卡
+.el-picker-panel__body {
+  .el-picker-panel__content {
+    .el-date-table {
+      td.today span {
+        color: @primary !important;
+        border-bottom: 2px solid @primary !important;
+      }
+
+      td.available span:hover {
+        &:hover {
+          background-color: @primary;
+          color: #fff !important;
+        }
+      }
+
+      td.in-range div {
+        &:hover {
+          background-color: @primaryBgc !important;
+        }
+
+        > span {
+          &:hover {
+            color: #fff !important;
+          }
+        }
+
+        & {
+          background-color: @primaryBgc !important;
+        }
+      }
+
+      td.end-date div > span,
+      td.start-date div > span {
+        &,
+        &:hover {
+          background: @primary !important;
+          color: #fff !important;
+        }
+
+        &.today {
+          color: #fff !important;
+        }
+      }
+
+      td.current:not(.disabled) span {
+        background-color: @primary;
+        color: #fff !important;
+      }
+    }
+
+    .el-year-table {
+      td .cell:hover {
+        background-color: @primary;
+        color: #fff;
+      }
+
+      td.current:not(.disabled) .cell {
+        background-color: @primary !important;
+      }
+
+      td.today:not(.current) .cell {
+        color: @primary !important;
+        border-bottom: 2px solid @primary !important;
+
+        &:hover {
+          color: #fff !important;
+        }
+      }
+    }
+  }
+}
+
+.el-date-picker__header-label.active,
+.el-date-picker__header-label:hover {
+  color: @primary !important;
+}
+
+.el-picker-panel__icon-btn {
+  &:hover {
+    color: @primary !important;
+
+    .el-input__inner {
+      border-color: @primary !important;
+    }
+  }
+}
+
+// 分页器
+.el-pagination:not(.is-disabled) {
+  .btn-prev,
+  .btn-next {
+    &:hover {
+      border-color: @primary !important;
+      color: @primary !important;
+    }
+
+    &:disabled {
+      &:hover {
+        border-color: #bfbfbf !important;
+        color: #bfbfbf !important;
+      }
+    }
+  }
+}
+
+.el-pager li {
+  &:hover {
+    border-color: @primary !important;
+    color: @primary !important;
+  }
+
+  &.active {
+    background-color: @primary !important;
+    border-color: @primary !important;
+
+    &:hover {
+      color: #fff !important;
+    }
+  }
+}
+
+// 单选卡
+.el-checkbox__input:not(.is-disabled) {
+  &.is-checked,
+  &.is-indeterminate {
+    .el-checkbox__inner {
+      background-color: @primary !important;
+      border-color: @primary !important;
+    }
+  }
+
+  &.is-focus .el-checkbox__inner {
+    border-color: @primary !important;
+  }
+
+  .el-checkbox__inner {
+    &:hover,
+    &:focus,
+    &:active {
+      border-color: @primary !important;
+    }
+
+    outline: @primary !important;
+  }
+}
+
+// 加载loading
+.el-loading-spinner .path {
+  stroke: @primary !important;
+}
+
+.el-switch:not(.is-disabled) {
+  &.is-checked {
+    .el-switch__core {
+      border-color: @primary !important;
+      background-color: @primary !important;
+    }
+  }
+}
+
+.el-switch.is-disabled {
+  &.is-checked {
+    .el-switch__core {
+      border-color: @primary !important;
+      background-color: @primary !important;
+    }
+  }
+}
+
+// textarea
+.el-textarea__inner:focus,
+.el-textarea__inner:hover {
+  border-color: @primary !important;
+}
+
+// radio
+.el-radio__input:not(.is-disabled) {
+  &.is-checked {
+    .el-radio__inner {
+      border-color: @primary !important;
+
+      &::after {
+        background: @primary !important;
+      }
+    }
+  }
+}
+
+.el-radio__inner:hover {
+  border-color: @primary !important;
+}
+
+.el-radio__input.is-checked:not(.is-disabled) + .el-radio__label {
+  color: @primary !important;
+}
+
+// dialog close
+.el-dialog__headerbtn .el-dialog__close {
+  &:hover {
+    color: @primary !important;
+  }
+}
+
+.el-menu--horizontal .el-menu-item:not(.is-disabled) {
+  &:focus,
+  &:hover,
+  &.is-active {
+    color: @primary !important;
+    border-bottom-color: @primary !important;
+  }
+}
+
+.el-loading-spinner .el-loading-text {
+  color: @primary !important;
+}
+
+.el-tabs__item.is-active {
+  color: @primary !important;
+}
+
+.el-tabs__item:not(.is-disabled):hover {
+  color: @primary !important;
+}
+
+.el-upload-dragger:not(.is-disabled) {
+  &:hover {
+    border-color: @primary !important;
+  }
+}
+
+//头部快速发起dropdown
+.header-new-drop:not(.is-disabled):hover {
+  color: @primary !important;
+  background-color: @primaryBgc !important;
+}
+
+.el-input-number__decrease,
+.el-input-number__increase {
+  &:not(.is-disabled):hover {
+    color: @primary !important;
+
+    ~ .el-input .el-input__inner:not(.is-disabled) {
+      border-color: @primary !important;
+    }
+  }
+}
+
+.el-input-number.is-disabled {
+  .el-input-number__decrease,
+  .el-input-number__increase {
+    &:hover {
+      color: #e5e6eb !important;
+
+      ~ .el-input .el-input__inner:not(.is-disabled) {
+        border-color: #e5e6eb !important;
+      }
+    }
+  }
+}
+
+.el-select .el-input__inner:focus,
+.el-select:hover .el-input__inner {
+  border-color: @primary !important;
+}
+
+// 解决组件库样式问题，暂时写在这，登录按钮loading
+.el-button--primary.is-loading .loading-text {
+  justify-content: center;
+
+  .el-loading-spinner {
+    width: auto !important;
+  }
+}
+
+.el-radio__input.is-checked .el-radio__inner {
+  background: transparent !important;
+}
+
+.el-radio.is-bordered.is-checked {
+  border-color: @primary !important;
+}
+.xcx-histoyr-el-radio .el-radio {
+  margin-right: 0;
+}
+
+.el-upload-dragger.is-dragover {
+  background-color: rgba(255, 122, 37, 0.1) !important;
+  border: 2px dashed @primary !important;
+}
+
+.el-upload:focus {
+  .el-upload-dragger {
+    border-color: @primary !important;
+  }
+}

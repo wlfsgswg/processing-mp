@@ -1,0 +1,74 @@
+.xlsx {
+  font-size: 14px !important;
+  background-color: #f2f2f2;
+  box-sizing: border-box;
+  width: 100vw;
+  height: 100vh;
+  padding: 16px;
+  .xlsx-sm {
+    padding-bottom: 16px;
+  }
+  .xlsx-container {
+    box-sizing: border-box;
+    width: calc(100vw - 32px);
+    height: calc(100vh - 88px);
+    overflow-y: auto;
+    &-upload {
+      padding: 16px;
+      background-color: #fff;
+      margin-bottom: 16px;
+      border-radius: 8px;
+      .upload {
+        .el-upload-dragger {
+          width: 180px;
+        }
+        &.upload360 {
+          width: 360px;
+        }
+      }
+    }
+    &-template {
+      padding: 16px;
+      background-color: #fff;
+      margin-bottom: 16px;
+      border-radius: 8px;
+      .header {
+        line-height: 32px;
+      }
+      .text {
+        line-height: 32px;
+      }
+    }
+    .bg-purple-sr {
+      display: flex;
+      line-height: 32px;
+      justify-content: space-between;
+      .my-bth {
+        color: #ff7a25 !important;
+        cursor: pointer;
+      }
+    }
+    &-content {
+      padding: 16px;
+      background-color: #fff;
+      margin-bottom: 16px;
+      border-radius: 8px;
+      .out-list-item {
+        display: flex;
+        justify-content: space-between;
+        line-height: 32px;
+        color: #666;
+        margin-bottom: 16px;
+        &:nth-last-child(1) {
+          margin-bottom: 0;
+        }
+        .text {
+          flex: 1;
+        }
+        .btn {
+          margin-left: 10px;
+        }
+      }
+    }
+  }
+}
