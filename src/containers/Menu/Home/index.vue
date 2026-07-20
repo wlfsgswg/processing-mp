@@ -1,15 +1,10 @@
 <template>
-  <div class="xlsx">
-    <div class="xlsx-sm">
-      <el-alert
-        title="免责声明：本页面不存储用户信息"
-        type="warning"
-        :closable="false"
-      >
-      </el-alert>
+  <div class="home">
+    <div class="home-sm">
+
     </div>
-    <div class="xlsx-container">
-      <div class="xlsx-container-upload">
+    <div class="home-container">
+      <div class="home-container-upload">
         <div class="p-b-20">
           <Title title="上传文件"></Title>
         </div>
@@ -35,21 +30,23 @@
           </el-upload>
         </div>
       </div>
-      <div class="xlsx-container-template">
+      <div class="home-container-template">
         <div class="p-b-20">
           <Title title="自定义模板"></Title>
         </div>
-        <div class="header" v-if="headers.length">
-          表头：
-          <el-tag
-            class="m-r-10"
-            size="small"
-            v-for="item in headers"
-            :key="item"
-            :type="item"
-          >
-            {{ item }}
-          </el-tag>
+        <div class="home-header" v-if="headers.length">
+          <span> 表头： </span>
+          <span>
+            <el-tag
+              class="m-r-10"
+              size="small"
+              v-for="item in headers"
+              :key="item"
+              :type="item"
+            >
+              {{ item }}
+            </el-tag>
+          </span>
         </div>
         <!-- 输入、输出 -->
         <el-row :gutter="24">
@@ -98,7 +95,7 @@
           >
         </div>
       </div>
-      <div class="xlsx-container-content" v-if="outList.length">
+      <div class="home-container-content" v-if="outList.length">
         <div class="p-b-20">
           <Title
             title="输出内容"
@@ -109,7 +106,7 @@
         <div v-if="isMerge" class="out-list-item">
           <div class="text">{{ outList.join(",") }}</div>
           <div class="btn">
-            <el-button type="text" size="small" @click="handleCopy('merge')"
+            <el-button type="text" @click="handleCopy('merge')"
               >复制</el-button
             >
           </div>
@@ -122,7 +119,7 @@
           >
             <div class="text">{{ item }}</div>
             <div class="btn">
-              <el-button type="text" size="small" @click="handleCopy(item)"
+              <el-button type="text" @click="handleCopy(item)"
                 >复制</el-button
               >
             </div>

@@ -1,17 +1,10 @@
-.xlsx {
-  font-size: 14px !important;
+.home {
   background-color: #f2f2f2;
   box-sizing: border-box;
-  width: 100vw;
-  height: 100vh;
-  padding: 16px;
-  .xlsx-sm {
-    padding-bottom: 16px;
-  }
-  .xlsx-container {
+  width: 100%;
+  height: 100%;
+  .home-container {
     box-sizing: border-box;
-    width: calc(100vw - 32px);
-    height: calc(100vh - 88px);
     overflow-y: auto;
     &-upload {
       padding: 16px;
@@ -46,12 +39,12 @@
       .my-bth {
         color: #ff7a25 !important;
         cursor: pointer;
+        font-size: 14px;
       }
     }
     &-content {
       padding: 16px;
       background-color: #fff;
-      margin-bottom: 16px;
       border-radius: 8px;
       .out-list-item {
         display: flex;
@@ -64,6 +57,15 @@
         }
         .text {
           flex: 1;
+          /* 核心强制任意字符断开，数字/逗号直接切分行 */
+          word-break: break-all;
+          /* 标准兼容长单词换行 */
+          overflow-wrap: break-word;
+          word-wrap: break-word;
+          /* 禁止空白合并、不自动压缩空格（纯数字串必备） */
+          white-space: normal;
+          /* 关键：容器必须有宽度限制，flex子元素要加min-width:0 */
+          min-width: 0;
         }
         .btn {
           margin-left: 10px;

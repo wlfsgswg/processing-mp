@@ -1,4 +1,5 @@
 const XLSX = require("xlsx");
+const { accountList } = require("./const");
 // 格式化输出
 function formatExcelDate(num) {
   const d = XLSX.SSF.parse_date_code(num);
@@ -33,8 +34,27 @@ function createNewXlsx(list) {
   XLSX.writeFile(newWorkbook, outputPath);
 }
 
+const fromAccountGetPassword = (account) => {
+  let password = "--";
+  accountList.map((it) => {
+    if (it.account === account) password = it.password;
+  });
+  return password;
+};
+
+// 随机生成guid
+const guid = () => {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
+
 module.exports = {
+  guid,
   createNewXlsx,
   formatExcelDate,
   isMobileDevice,
+  fromAccountGetPassword,
 };

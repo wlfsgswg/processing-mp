@@ -1,7 +1,7 @@
 <template>
   <div class="xcx-components-leftmenu">
     <div class="img">
-      <!-- <img :src="Logo" alt="" /> -->
+      <img :src="Logo" alt="" />
     </div>
     <el-menu
       background-color="#fff"
@@ -27,7 +27,11 @@
             <template slot="title">
               <i :class="item.icon"></i> <span>{{ item.title }}</span></template
             >
-            <el-menu-item v-for="it in item.children" :index="it.key" :key="it.key">
+            <el-menu-item
+              v-for="it in item.children"
+              :index="it.key"
+              :key="it.key"
+            >
               {{ it.title }}</el-menu-item
             >
           </el-submenu>
@@ -39,10 +43,13 @@
 
 <script>
 import { listMenu } from "./tyle";
+import Logo from "./../../assets/img/big_logo.png";
+
 import "./index.less";
 export default {
   name: "left-menu",
   data: () => ({
+    Logo,
     listMenu: [...listMenu],
     focus: "/home",
     openKeys: [],

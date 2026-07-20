@@ -7,7 +7,7 @@ Vue.use(VueRouter);
 const router = new VueRouter({
   // 如果不设置会优先采用锚点路由，采用此方式，需要后台配nginx把所有页面指向index.html
   mode: "history",
-  base: '/mp_processing/',
+  base: '/',
   routes // (缩写) 相当于 routes: routes
 });
 // 路由守卫
