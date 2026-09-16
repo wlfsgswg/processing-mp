@@ -9,11 +9,12 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import AnimateNumber from "vue-animate-number";
 import VueClipboard from 'vue-clipboard2'
+import API from './common/api'
 Vue.use(ElementUI);
 Vue.use(AnimateNumber);
 Vue.use(VueClipboard);
 Vue.config.productionTip = false;
-
+Vue.prototype.$API = API // 全局请求方法
 // 解决编程式路由往同一地址跳转时会报错的情况
 const originalPush = VueRouter.prototype.push
 const originalReplace = VueRouter.prototype.replace

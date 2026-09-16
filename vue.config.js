@@ -7,8 +7,8 @@ module.exports = {
   devServer: {
     proxy: {
       "/api": {
-        // target: "http://localhost:3000/",
-        target: "https://qifumoni.com/",
+        target: "http://localhost:3000/",
+        // target: "https://qifumoni.com/",
         ws: true,
         changeOrigin: true,
       },

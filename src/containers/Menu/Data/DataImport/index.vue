@@ -30,11 +30,11 @@
       </div>
       <div class="home-container-template">
         <div class="p-b-20">
-          <Title title="自定义模板"></Title>
+          <Title title="创建数据库表"></Title>
         </div>
-        <div class="home-header" v-if="headers.length">
+        <div class="home-header">
           <span> 表头： </span>
-          <span>
+          <span v-if="headers.length">
             <el-tag
               class="m-r-10 m-b-10"
               size="small"
@@ -45,79 +45,13 @@
               {{ item }}
             </el-tag>
           </span>
+          <span v-else>暂无表头，请先上传文件</span>
         </div>
-        <!-- 输入、输出 -->
-        <el-row :gutter="24">
-          <el-col :span="12">
-            <div class="grid-content bg-purple">
-              <div class="bg-purple-sr">
-                <div class="text">输入：</div>
-                <div
-                  class="my-bth"
-                  @click="handleInsert"
-                  v-if="headers.length && insertBtn"
-                >
-                  插入所有表头
-                </div>
-              </div>
-              <div>
-                <el-input
-                  type="textarea"
-                  :rows="3"
-                  placeholder="自定义内容，请把需要插入的表头放入{{}}内"
-                  v-model="textarea"
-                >
-                </el-input>
-              </div>
-            </div>
-          </el-col>
-          <el-col :span="12">
-            <div class="grid-content bg-purple">
-              <div class="text">输出：</div>
-              <div>
-                <el-input
-                  type="textarea"
-                  :rows="3"
-                  placeholder="输出内容"
-                  :value="textarea2"
-                  disabled
-                >
-                </el-input>
-              </div>
-            </div>
-          </el-col>
-        </el-row>
-        <div class="p-t-20 t-a-r">
-          <el-button type="primary" size="small" @click="handleReturn"
-            >按照模板输出</el-button
+        <!-- 创建数据库表 -->
+        <div class="t-a-r">
+          <el-button type="primary" size="small" @click="handleCreate"
+            >创建</el-button
           >
-        </div>
-      </div>
-      <div class="home-container-content" v-if="outList.length">
-        <div class="p-b-20">
-          <Title
-            title="输出内容"
-            :updateTitle="isMerge ? '单条展示' : '合并展示'"
-            @onUpdate="handleUpdata"
-          ></Title>
-        </div>
-        <div v-if="isMerge" class="out-list-item">
-          <div class="text">{{ outList.join(",") }}</div>
-          <div class="btn">
-            <el-button type="text" @click="handleCopy('merge')">复制</el-button>
-          </div>
-        </div>
-        <div v-else>
-          <div
-            v-for="(item, index) in outList"
-            :key="index"
-            class="out-list-item"
-          >
-            <div class="text">{{ item }}</div>
-            <div class="btn">
-              <el-button type="text" @click="handleCopy(item)">复制</el-button>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -127,7 +61,6 @@
 <script>
 import "./index.less";
 import {
-  formatExcelDate,
   isMobileDevice,
   // createNewXlsx,
 } from "@/common/utils.js";
@@ -142,20 +75,13 @@ export default {
     list: [],
     headers: [],
     fileList: [],
-    textarea: "",
-    outList: [],
     isMobile: false,
-    isMerge: false,
     workBook: "",
-    insertBtn: true,
   }),
   mounted() {
     this.isMobile = isMobileDevice();
   },
   methods: {
-    handleUpdata() {
-      this.isMerge = !this.isMerge;
-    },
     async handleToJson(fileUrl) {
       // 发起网络请求获取excel二进制数据
       const res = await fetch(fileUrl);
@@ -212,7 +138,6 @@ export default {
         // 替换为清理后的sheet
         workbook.Sheets[sheetName] = cleanSheet;
       });
-
       // 获取第1个工作表
       const firstSheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[firstSheetName];
@@ -246,6 +171,7 @@ export default {
 
       this.list = list.slice(1);
       this.headers = headers;
+      console.log("list", this.list);
       // 下载新表
       // createNewXlsx(this.list);
     },
@@ -257,67 +183,41 @@ export default {
       // 处理
       this.handleToJson(localFileUrl);
     },
-    handleReturn() {
-      if (!this.list.length)
+    handleCreate() {
+      if (!this.headers.length)
         return this.$message({
-          message: "请先上传文件",
-          type: "error",
+          message: "暂无表头，请先上传文件",
+          type: "warning",
         });
-
-      if (!this.textarea)
-        return this.$message({
-          message: "请先设置模板",
-          type: "error",
+      this.$prompt("请添加表名", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        inputPattern: /^[a-z]+$/,
+        inputErrorMessage: "仅支持输入小写字母，不要与以往表名重复",
+      })
+        .then(({ value }) => {
+          // 请求后端接口，塞入表名和this.header,生成一张表
+          this.$API
+            .createTable({
+              tablename: value,
+              headers: this.headers,
+            })
+            .then((res) => {
+              this.$message({
+                type: "success",
+                message: res.message || "创建成功",
+              });
+              console.log("res", res);
+            });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "取消输入",
+          });
         });
-      // 模板
-      const temp = this.textarea;
-      const outList = [];
-
-      for (let index = 0; index < this.list.length; index++) {
-        const e = this.list[index];
-        outList.push(
-          temp.replace(/\{\{([^}]+)\}\}/g, (match, key) => {
-            return key === "办结时间"
-              ? formatExcelDate(e[key])
-              : e[key] ?? "--"; // 找不到就保留原占位符
-          }),
-        );
-      }
-
-      this.outList = outList;
-    },
-    // 复制
-    handleCopy(text) {
-      if (text === "merge") {
-        text = this.outList.join(",");
-      }
-      this.$copyText(text).then(() => {
-        this.$message({
-          message: "复制成功",
-          type: "success",
-        });
-      });
-    },
-    // 插入表头
-    handleInsert() {
-      let str = "";
-      for (let index = 0; index < this.headers.length; index++) {
-        str =
-          str +
-          `{{${this.headers[index]}}}${
-            index !== this.headers.length - 1 ? "，" : ""
-          }`;
-      }
-      this.textarea = this.textarea + str;
-      this.insertBtn = false;
     },
   },
   watch: {},
-  computed: {
-    textarea2() {
-      const textarea = this.textarea.trim();
-      return textarea.replace(/\{\{([^}]+)\}\}/g, "/$1列内容/");
-    },
-  },
 };
 </script>

@@ -14,12 +14,12 @@
           <slot :name="item.prop" :row="scope.row"></slot>
         </template>
       </el-table-column>
-      <el-table-column :fixed="operate.fixed" :key="operate.prop" :prop="operate.prop" :label="operate.label"
+      <!-- <el-table-column :fixed="operate.fixed" :key="operate.prop" :prop="operate.prop" :label="operate.label"
         :width="operate.width" :show-overflow-tooltip="operate.noTooltip ? false : true">
         <template :slot-scope="scope" #default="scope">
           <slot :name="operate.prop" :row="scope.row"></slot>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
   </div>
 </template>
@@ -66,8 +66,9 @@ export default {
     columns: {
       handler(e) {
         const columnsList = JSON.parse(JSON.stringify(e));
-        this.operate = columnsList.pop();
+        // this.operate = columnsList.pop();
         this.notOperateColumns = columnsList;
+        // console.log(this.notOperateColumns,'notOperateColumns')
       },
       immediate: true,
     },

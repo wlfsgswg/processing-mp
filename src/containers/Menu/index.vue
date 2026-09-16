@@ -9,7 +9,7 @@
           <div>
             <el-dropdown trigger="hover">
               <span class="el-dropdown-link">
-                {{ global.account
+                {{ account
                 }}<i class="el-icon-caret-bottom el-icon--right c999"></i>
               </span>
               <el-dropdown-menu slot="dropdown">
@@ -46,12 +46,12 @@ export default {
     LeftMenu,
   },
   data: () => ({
-    global: {},
+    account: "",
   }),
   mounted() {
     const code = Cookies.get()?.code;
     const account = (code && code.split("_")[2]) || "";
-    if (account) this.global.account = account;
+    if (account) this.account = account;
   },
   methods: {
     loginOut() {

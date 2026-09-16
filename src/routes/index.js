@@ -10,16 +10,16 @@ const routes = [
                 component: () =>
                     import("@/containers/Menu/Home/index.vue")
             },
-            // guess
+            // data
             {
-                path: "/guess/questioncontrol",
+                path: "/data/import",
                 component: () =>
-                    import("@/containers/Menu/Guess/QuestionControl/index.vue"),
+                    import("@/containers/Menu/Data/DataImport/index.vue"),
             },
             {
-                path: "/guess/globalconfig",
+                path: "/data/show",
                 component: () =>
-                    import("@/containers/Menu/Guess/GlobalConfig/index.vue"),
+                    import("@/containers/Menu/Data/DataShow/index.vue"),
             },
             // system
             {

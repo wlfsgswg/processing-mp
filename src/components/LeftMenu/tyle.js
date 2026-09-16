@@ -1,31 +1,34 @@
-const listMenu = [{
+const listMenu = [
+  {
     key: "/home",
-    icon: 'el-icon-data-line',
+    icon: "el-icon-data-line",
     title: "首页",
-},
-{
-    key: "/guess",
-    icon: 'el-icon-tickets',
-    title: "猜猜配置",
+  },
+  {
+    key: "/data",
+    icon: "el-icon-tickets",
+    title: "数据处理",
     children: [
-        {
-            key: "/guess/questioncontrol",
-            title: "问题管理",
-        },
-        {
-            key: "/guess/globalconfig",
-            title: "全局配置",
-        }
-    ]
-},
-{
+      {
+        key: "/data/import",
+        title: "数据导入",
+      },
+      // {
+      //   key: "/data/show",
+      //   title: "数据展示",
+      // },
+    ],
+  },
+  {
     key: "/system",
-    icon: 'el-icon-monitor',
+    icon: "el-icon-monitor",
     title: "系统配置",
-    children: [{
+    children: [
+      {
         key: "/system/accountcontrol",
         title: "账号管理",
-    }]
-},
+      },
+    ],
+  },
 ];
 export { listMenu };
