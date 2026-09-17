@@ -94,4 +94,38 @@ const accountList = [
   },
 ];
 
-export { grades, pickerOptions, fromValueGetName, accountList };
+// 默认显示表头
+const headerBasicCell = [
+  "序号",
+  "线索来源",
+  "受理日期",
+  "主要被反映人姓名",
+  // "主要被反映人单位及职务",
+  // "主要被反映人职级",
+  "主要问题摘要",
+  // "归属全国性重点整治项目情况",
+  // "归属全国性重大民生实事情况",
+  // "归属省级重点整治项目情况",
+  // "初次处置方式",
+  "初次处置日期",
+  "是否立案",
+  "立案日期",
+  "立案人数",
+  // "是否采取留置措施",
+  // "留置日期",
+  // "留置人数",
+  // "反映问题是否属实",
+  // "是否查结",
+  "备注",
+  "承办单位",
+  "办结日期",
+  "办理结果100字以内简要填写处理处分情况",
+];
+
+export {
+  grades,
+  pickerOptions,
+  fromValueGetName,
+  accountList,
+  headerBasicCell,
+};

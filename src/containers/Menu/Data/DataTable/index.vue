@@ -7,29 +7,45 @@
         <el-row>
           <el-col :span="8">
             <div class="search-item">
-              <div class="label">被反映人姓名：</div>
+              <div class="label">线索来源：</div>
               <div class="component">
-                <el-input
-                  v-model="search.主要被反映人姓名"
+                <el-select
+                  filterable
+                  v-model="search.线索来源"
+                  placeholder="请选择线索来源"
                   size="small"
-                  placeholder="请输入被反映人姓名"
                   :style="{ width: '100%' }"
                   clearable
-                ></el-input>
+                >
+                  <el-option
+                    v-for="it in sourceList"
+                    :label="it"
+                    :value="it"
+                    :key="it"
+                  ></el-option>
+                </el-select>
               </div>
             </div>
           </el-col>
           <el-col :span="8">
             <div class="search-item">
-              <div class="label">被反映人职级：</div>
+              <div class="label">承办单位：</div>
               <div class="component">
-                <el-input
-                  v-model="search.主要被反映人职级"
+                <el-select
+                  filterable
+                  v-model="search.承办单位"
+                  placeholder="请选择承办单位"
                   size="small"
-                  placeholder="请输入被反映人职级"
                   :style="{ width: '100%' }"
                   clearable
-                ></el-input>
+                >
+                  <el-option
+                    v-for="it in departmentList"
+                    :label="it"
+                    :value="it"
+                    :key="it"
+                  ></el-option>
+                </el-select>
               </div>
             </div>
           </el-col>
@@ -49,30 +65,18 @@
           </el-col>
         </el-row>
       </div>
-      <!-- <div class="p-t-20 p-b-20">
-        <el-row>
-          <el-col :span="8">
-            <div class="search-item">
-              <div class="label">创建时间：</div>
-              <div class="component">
-                <el-date-picker
-                  v-model="search.time"
-                  size="small"
-                  type="daterange"
-                  unlink-panels
-                  :style="{ width: '100%' }"
-                  range-separator="至"
-                  start-placeholder="开始日期"
-                  end-placeholder="结束日期"
-                  value-format="yyyy-MM-dd"
-                  :picker-options="pickerOptions"
-                >
-                </el-date-picker>
-              </div>
-            </div>
-          </el-col>
-        </el-row>
-      </div> -->
+    </div>
+    <div class="p-b-20 clearfix">
+      <div class="l-left p-r-20">
+        <el-button type="primary" size="small" @click="dialogVisible = true">
+          设置表头
+        </el-button>
+      </div>
+      <div class="l-left">
+        <el-button type="primary" size="small" @click="handleImport">
+          导出数据</el-button
+        >
+      </div>
     </div>
     <div :class="`xcx-components-table`" v-if="tableColumns.length">
       <el-table
@@ -102,7 +106,6 @@
           :label="item.label"
           show-overflow-tooltip
           v-for="item in tableColumns"
-          :width="item.windth"
         >
         </el-table-column>
       </el-table>
@@ -120,13 +123,35 @@
       >
       </el-pagination>
     </div>
+    <Dialog
+      :visible="dialogVisible"
+      width="720px"
+      title="设置表头"
+      @onCancel="dialogVisible = false"
+      :slotObject="{ footer: true, content: true }"
+    >
+      <template #content>
+        <div class="dialog-content">
+          <div class="dialog-content-form">
+            <el-checkbox-group
+              v-model="checkedCell"
+              @change="handleCheckedCitiesChange"
+            >
+              <el-checkbox v-for="it in keys" :label="it" :key="it">{{
+                it
+              }}</el-checkbox>
+            </el-checkbox-group>
+          </div>
+        </div>
+      </template>
+    </Dialog>
   </div>
 </template>
 
 <script>
 import "./index.less";
-import { Title } from "@/components";
-import { pickerOptions } from "@/common/const";
+import { Title, Dialog } from "@/components";
+import { pickerOptions, headerBasicCell } from "@/common/const";
 import { mapState } from "vuex";
 
 export default {
@@ -145,28 +170,38 @@ export default {
     total: 0,
     // 搜索
     search: {
-      主要被反映人职级: "",
-      主要被反映人姓名: "",
+      线索来源: "",
+      承办单位: "",
     },
     // 分页
     page: {
       pageSize: 10,
       pageNum: 1,
     },
-    keys:[]
+    dialogVisible: false,
+    sourceList: [],
+    departmentList: [],
+    // 选项框
+    keys: [],
+    checkedCell: headerBasicCell,
   }),
   components: {
     Title,
+    Dialog,
   },
   mounted() {
     // 获取参数名字
     this.tablename = this.$route.query.name;
     this.handleQueryTableData();
+    this.handleQueryDistinctField("线索来源");
+    this.handleQueryDistinctField("承办单位");
   },
   methods: {
-    handleClick(row) {
-      console.log(row);
+    handleCheckedCitiesChange(value) {
+      console.log(value, this.checkedCell);
     },
+    // 导出数据
+    handleImport() {},
     // 请求
     handleQueryTableData() {
       this.loading = true;
@@ -183,22 +218,35 @@ export default {
           this.loading = false;
           const keys = Object.keys(this.list[0] || {}).slice(1);
           this.keys = keys;
-
           const tableColumns = [];
-          const length = keys.length;
+          const length = headerBasicCell.length;
           for (let index = 0; index < length; index++) {
-            const key = keys[index];
+            const key = headerBasicCell[index];
             tableColumns.push({
               label: key,
               prop: key,
-              minWidth: 10,
-              width: 400,
             });
           }
           this.tableColumns = tableColumns;
         })
         .catch(() => {
           this.loading = false;
+        });
+    },
+    // 获取下拉框
+    handleQueryDistinctField(field) {
+      this.$API
+        .queryDistinctField({
+          tablename: this.tablename,
+          field,
+        })
+        .then((res) => {
+          if (field === "线索来源") {
+            this.sourceList = res.options || [];
+          }
+          if (field === "承办单位") {
+            this.departmentList = res.options || [];
+          }
         });
     },
     // 查询

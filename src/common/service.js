@@ -57,19 +57,19 @@ class HttpRequest {
         .then((response) => {
           const result = this.transformResponse(response, requestOptions);
           if (result.status === 500) {
-            Message.error(result.message || "请求出错");
+            Message.error(result.message || result.msg || "请求出错");
             reject(result);
           } else {
             if (result.status === 200 || result.code === 0) {
               resolve(result);
             } else {
-              Message.error(result.message || "请求出错");
+              Message.error(result.message || result.msg || "请求出错");
               reject(result);
             }
           }
         })
         .catch((error) => {
-          Message.error(error.message || "请求出错");
+          Message.error(error.message || error.msg || "请求出错");
           reject(error);
         })
         .finally((response) => {

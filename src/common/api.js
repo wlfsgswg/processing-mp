@@ -17,10 +17,16 @@ const requestAddressList = [
     url: "/api/import/data",
     type: "post",
   },
-   {
+  {
     describe: "查询数据",
     method: "queryTableData",
     url: "/api/query/tableData",
+    type: "post",
+  },
+  {
+    describe: "查询下拉框选项",
+    method: "queryDistinctField",
+    url: "/api/query/distinctField",
     type: "post",
   },
 ];

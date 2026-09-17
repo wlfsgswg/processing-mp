@@ -61,10 +61,25 @@ function vwToPx(vwVal) {
   return (vwVal / 100) * viewportWidth;
 }
 
+function filterEmptyObj(arr) {
+  return arr.filter(item => {
+    // 跳过非对象
+    if (typeof item !== 'object' || item === null) return true;
+    // 取出对象所有value
+    const values = Object.values(item);
+    // 判断：是否至少有一项不为空（''、null、undefined 视为空）
+    const hasValue = values.some(val => {
+      return val !== '' && val !== null && val !== undefined;
+    })
+    return hasValue;
+  })
+}
+
 module.exports = {
   vwToPx,
   guid,
   createNewXlsx,
+  filterEmptyObj,
   formatExcelDate,
   isMobileDevice,
   fromAccountGetPassword,

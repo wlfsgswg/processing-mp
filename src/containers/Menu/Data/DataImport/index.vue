@@ -84,7 +84,7 @@
 
 <script>
 import "./index.less";
-import { isMobileDevice } from "@/common/utils.js";
+import { isMobileDevice, filterEmptyObj } from "@/common/utils.js";
 import { Title } from "@/components";
 
 export default {
@@ -199,7 +199,9 @@ export default {
       });
       // 提取表头
       const headers = list.length ? Object.keys(list[0]) : [];
-      this.list = list.slice(1);
+      this.list = filterEmptyObj(list);
+      console.log("list", this.list);
+
       this.headers = headers;
     },
     handleFileChange(fileObj, fileList) {
