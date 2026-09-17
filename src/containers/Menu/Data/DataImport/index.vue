@@ -113,95 +113,110 @@ export default {
         alert("文件不存在，请检查路径");
         return;
       }
-      // 拿到二进制buffer后用xlsx库解析
       const buffer = await res.arrayBuffer();
       const XLSX = require("xlsx");
-      // 开启cellDates：excel日期单元格读取为JS Date对象
       const workbook = XLSX.read(buffer, { cellDates: true });
 
-      // 处理所有工作表
-      let startRow = 1;
-      Object.keys(workbook.Sheets).forEach((sheetName) => {
-        const sheet = workbook.Sheets[sheetName];
-        const cleanSheet = {};
-        // 1. 复制配置项，清除工作表保护 !protect
-        Object.entries(sheet).forEach(([key, val]) => {
-          if (key.startsWith("!")) {
-            if (key !== "!protect") cleanSheet[key] = val;
-          }
-        });
-        // 清空合并单元格，去掉跨列大标题样式
-        cleanSheet["!merges"] = [];
-        // 2. 自动识别正文起始行（过滤顶部标题大头）
-        const rowMap = {};
-        const allRows = new Set();
-        Object.entries(sheet).forEach(([cellKey]) => {
-          if (cellKey.startsWith("!")) return;
-          const rowNum = parseInt(cellKey.match(/\d+/)[0]);
-          const col = cellKey.replace(/\d+/g, "");
-          allRows.add(rowNum);
-          if (!rowMap[rowNum]) rowMap[rowNum] = new Set();
-          rowMap[rowNum].add(col);
-        });
-        const sortedRows = Array.from(allRows).sort((a, b) => a - b);
-        // 判断规则：一行超过3列有内容 = 正式表格表头
-        startRow = sortedRows[sortedRows.length - 1];
-        for (const r of sortedRows) {
-          if (rowMap[r].size >= 3) {
-            startRow = r;
-            break;
-          }
-        }
-        // 3. 只保留正文行，丢弃上方所有标题
-        Object.entries(sheet).forEach(([cellKey, cellVal]) => {
-          if (cellKey.startsWith("!")) return;
-          const r = parseInt(cellKey.match(/\d+/)[0]);
-          if (r >= startRow) {
-            cleanSheet[cellKey] = cellVal;
-          }
-        });
-        // 替换为清理后的sheet
-        workbook.Sheets[sheetName] = cleanSheet;
-      });
-
-      // 获取第1个工作表
       const firstSheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[firstSheetName];
+      const originWorksheet = workbook.Sheets[firstSheetName];
 
-      // 1. 读取二维数组并清洗所有文本，日期转 yyyy-MM-dd
-      const aoaData = XLSX.utils
-        .sheet_to_json(worksheet, { header: 1, blankrows: true })
-        .map((row) => {
-          return row.map((cell) => {
-            // 日期处理：转成 2025-01-01
-            if (cell instanceof Date) {
-              const y = cell.getFullYear();
-              const m = String(cell.getMonth() + 1).padStart(2, "0");
-              const d = String(cell.getDate()).padStart(2, "0");
-              return `${y}-${m}-${d}`;
-            }
-            if (typeof cell === "number") {
+      // =========【第一步：在原始sheet上，找到startRow起始行，不要修改原始sheet！】=========
+      let startRow = 1;
+      const rowMap = {};
+      const allRows = new Set();
+      Object.entries(originWorksheet).forEach(([cellKey]) => {
+        if (cellKey.startsWith("!")) return;
+        const rowNum = parseInt(cellKey.match(/\d+/)[0]);
+        const col = cellKey.replace(/\d+/g, "");
+        allRows.add(rowNum);
+        if (!rowMap[rowNum]) rowMap[rowNum] = new Set();
+        rowMap[rowNum].add(col);
+      });
+      const sortedRows = Array.from(allRows).sort((a, b) => a - b);
+      startRow = sortedRows[sortedRows.length - 1];
+      for (const r of sortedRows) {
+        if (rowMap[r].size >= 3) {
+          startRow = r;
+          break;
+        }
+      }
+
+      // 日期工具函数
+      const excelSerialToDate = (serial) =>
+        new Date(Math.round((serial - 25569) * 86400 * 1000));
+      const fmtDate = (d) => {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, "0");
+        const dd = String(d.getDate()).padStart(2, "0");
+        return `${y}-${m}-${dd}`;
+      };
+      // 日期列匹配
+      const isDateColName = (name) =>
+        /日期|时间|date|time|年月日|day/gi.test(String(name).toLowerCase());
+
+      // =========【关键：直接从原始sheet读取raw二维数组，保留原始单元格类型】=========
+      const rawAoaAll = XLSX.utils.sheet_to_json(originWorksheet, {
+        header: 1,
+        blankrows: true,
+        raw: true,
+      });
+      // 只保留 >= startRow 的行，丢弃顶部标题行
+      const rawAoa = rawAoaAll.slice(startRow - 1);
+      const headers0 = (rawAoa[0] || []).map((h) =>
+        h == null ? "" : String(h).trim(),
+      );
+
+      // 清洗每一行
+      const aoaData = rawAoa.map((row) => {
+        return row.map((cell, ci) => {
+          // 1.原生Date对象
+          if (cell instanceof Date) return fmtDate(cell);
+
+          // 2. 数字序列号（原始单元格是number）
+          if (typeof cell === "number") {
+            // 如果是日期列，并且序列号范围合法
+            if (isDateColName(headers0[ci]) && cell >= 20000 && cell <= 60000) {
+              return fmtDate(excelSerialToDate(cell));
+            } else {
+              //普通数字
               return Number(cell.toFixed(2));
             }
-            if (typeof cell !== "string") return cell;
-            return cell.replace(/\s/g, "").trim();
-          });
-        });
+          }
 
-      // 2. 重建工作表，重置行号从A1开始
+          // 3. 重点：如果是字符串，尝试转数字再判断！解决'46048'字符串序列号
+          if (typeof cell === "string") {
+            const trimStr = cell.replace(/\s/g, "").trim();
+            // 字符串能转为数字，并且当前列为日期列
+            if (/^\d+$/.test(trimStr)) {
+              const numVal = Number(trimStr);
+              if (
+                isDateColName(headers0[ci]) &&
+                numVal >= 20000 &&
+                numVal <= 60000
+              ) {
+                return fmtDate(excelSerialToDate(numVal));
+              }
+            }
+            return trimStr;
+          }
+          // 其他
+          if (cell === null || cell === undefined) return "";
+          return cell;
+        });
+      });
+
+      // 重建工作表
       const newWorksheet = XLSX.utils.aoa_to_sheet(aoaData);
       workbook.Sheets[firstSheetName] = newWorksheet;
 
-      // 3. 转换为标准对象数组（key为清洗后的表头）
+      // 转对象数组
       const list = XLSX.utils.sheet_to_json(newWorksheet, {
-        defval: "", // 空白单元格填空字符串，避免被当缺失
+        defval: "",
         blankrows: true,
       });
-      // 提取表头
       const headers = list.length ? Object.keys(list[0]) : [];
       this.list = filterEmptyObj(list);
       console.log("list", this.list);
-
       this.headers = headers;
     },
     handleFileChange(fileObj, fileList) {

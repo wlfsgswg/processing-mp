@@ -197,8 +197,17 @@ export default {
     this.handleQueryDistinctField("承办单位");
   },
   methods: {
-    handleCheckedCitiesChange(value) {
-      console.log(value, this.checkedCell);
+    handleCheckedCitiesChange() {
+      const tableColumns = [];
+      const length = this.checkedCell.length;
+      for (let index = 0; index < length; index++) {
+        const key = this.checkedCell[index];
+        tableColumns.push({
+          label: key,
+          prop: key,
+        });
+      }
+      this.tableColumns = tableColumns;
     },
     // 导出数据
     handleImport() {},
