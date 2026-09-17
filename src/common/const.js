@@ -121,11 +121,17 @@ const headerBasicCell = [
   "办结日期",
   "办理结果100字以内简要填写处理处分情况",
 ];
-
+const headerBasicCellScope = [
+  "受理日期",
+  "初次处置日期",
+  "立案日期",
+  "办结日期",
+];
 export {
   grades,
   pickerOptions,
   fromValueGetName,
   accountList,
   headerBasicCell,
+  headerBasicCellScope,
 };

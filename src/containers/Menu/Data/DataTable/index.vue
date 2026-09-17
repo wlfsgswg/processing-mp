@@ -50,6 +50,46 @@
             </div>
           </el-col>
           <el-col :span="8">
+            <div class="search-item">
+              <div class="label">排序方式：</div>
+              <div class="component">
+                <el-select
+                  filterable
+                  v-model="search.sort"
+                  placeholder="请选择排序方式"
+                  size="small"
+                  :style="{ width: '100%' }"
+                  clearable
+                >
+                  <el-option
+                    label="受理日期"
+                    value="受理日期"
+                    key="1"
+                  ></el-option>
+                  <el-option
+                    label="初次处置日期"
+                    value="初次处置日期"
+                    key="2"
+                  ></el-option>
+                  <el-option
+                    label="立案日期"
+                    value="立案日期"
+                    key="3"
+                  ></el-option>
+                  <el-option
+                    label="办结日期"
+                    value="办结日期"
+                    key="4"
+                  ></el-option>
+                </el-select>
+              </div>
+            </div>
+          </el-col>
+        </el-row>
+      </div>
+      <div class="p-b-20 clearfix">
+        <el-row>
+          <el-col :span="24">
             <div class="search-btn clearfix">
               <div class="r-right">
                 <el-button type="primary" size="small" @click="handleSearch">
@@ -75,6 +115,11 @@
       <div class="l-left">
         <el-button type="primary" size="small" @click="handleImport">
           导出数据</el-button
+        >
+      </div>
+      <div class="r-right">
+        <el-button type="primary" size="small" @click="handleSkip">
+          图表展示</el-button
         >
       </div>
     </div>
@@ -107,6 +152,59 @@
           show-overflow-tooltip
           v-for="item in tableColumns"
         >
+          <!-- 作用域插槽：所有列都保留单元格结构，v-if只控制插槽内部自定义内容 -->
+          <template slot-scope="scope">
+            <!-- 判断：只有item.scope为true的时候，才渲染自定义内容；否则直接显示原始单元格值 -->
+            <div v-if="item.scope">
+              <!-- "受理日期", "初次处置日期", "立案日期", "办结日期" -->
+              <div>{{ scope.row[item.prop] }}</div>
+              <div class="p-t-5">
+                <div
+                  v-if="
+                    item.prop === '受理日期' && scope.row.受理日期obj.isOver
+                  "
+                >
+                  <el-tag
+                    size="small"
+                    :type="
+                      scope.row.受理日期obj.isOver === 1 ? 'warning' : 'danger'
+                    "
+                    >{{ scope.row.受理日期obj.tip }}</el-tag
+                  >
+                </div>
+              </div>
+              <div
+                v-if="
+                  item.prop === '初次处置日期' &&
+                  scope.row.初次处置日期obj.isOver
+                "
+              >
+                <el-tag
+                  size="small"
+                  :type="
+                    scope.row.初次处置日期obj.isOver === 1
+                      ? 'warning'
+                      : 'danger'
+                  "
+                  >{{ scope.row.初次处置日期obj.tip }}</el-tag
+                >
+              </div>
+              <div
+                v-if="item.prop === '立案日期' && scope.row.立案日期obj.isOver"
+              >
+                <el-tag
+                  size="small"
+                  :type="
+                    scope.row.立案日期obj.isOver === 1 ? 'warning' : 'danger'
+                  "
+                  >{{ scope.row.立案日期obj.tip }}</el-tag
+                >
+              </div>
+
+              <!--  -->
+            </div>
+            <span v-else>{{ scope.row[item.prop] }}</span>
+          </template>
         </el-table-column>
       </el-table>
     </div>
@@ -151,7 +249,12 @@
 <script>
 import "./index.less";
 import { Title, Dialog } from "@/components";
-import { pickerOptions, headerBasicCell } from "@/common/const";
+import {
+  pickerOptions,
+  headerBasicCell,
+  headerBasicCellScope,
+} from "@/common/const";
+import { checkSixMonth, checkTwelveMonth } from "@/common/utils";
 import { mapState } from "vuex";
 
 export default {
@@ -172,6 +275,7 @@ export default {
     search: {
       线索来源: "",
       承办单位: "",
+      sort: "",
     },
     // 分页
     page: {
@@ -197,12 +301,22 @@ export default {
     this.handleQueryDistinctField("承办单位");
   },
   methods: {
+    // 跳转到图表展示页面
+    handleSkip() {
+      this.$router.push({
+        path: "/data/charts",
+        query: {
+          name: this.tablename,
+        },
+      });
+    },
     handleCheckedCitiesChange() {
       const tableColumns = [];
       const length = this.checkedCell.length;
       for (let index = 0; index < length; index++) {
         const key = this.checkedCell[index];
         tableColumns.push({
+          scope: headerBasicCellScope.includes(key) ? true : false,
           label: key,
           prop: key,
         });
@@ -222,21 +336,40 @@ export default {
           ...this.page,
         })
         .then((res) => {
+          // 对list进行处理
+          for (let a = 0; a < res.list.length; a++) {
+            const e = res.list[a];
+            e.受理日期obj = checkSixMonth(e.受理日期);
+            e.初次处置日期obj =
+              e.是否立案 === "是"
+                ? { isOver: 0 }
+                : checkSixMonth(e.初次处置日期);
+            e.立案日期obj =
+              e.办结日期 === "是"
+                ? { isOver: 0 }
+                : checkTwelveMonth(e.立案日期);
+
+            console.log(e);
+          }
+
           this.list = res.list || [];
           this.total = res.total || 0;
           this.loading = false;
           const keys = Object.keys(this.list[0] || {}).slice(1);
           this.keys = keys;
-          const tableColumns = [];
-          const length = headerBasicCell.length;
-          for (let index = 0; index < length; index++) {
-            const key = headerBasicCell[index];
-            tableColumns.push({
-              label: key,
-              prop: key,
-            });
+          if (!this.tableColumns.length) {
+            const tableColumns = [];
+            const length = headerBasicCell.length;
+            for (let index = 0; index < length; index++) {
+              const key = headerBasicCell[index];
+              tableColumns.push({
+                scope: headerBasicCellScope.includes(key) ? true : false,
+                label: key,
+                prop: key,
+              });
+            }
+            this.tableColumns = tableColumns;
           }
-          this.tableColumns = tableColumns;
         })
         .catch(() => {
           this.loading = false;
@@ -262,8 +395,9 @@ export default {
     handleSearch(e) {
       if (e === "clear") {
         this.search = {
-          主要被反映人职级: "",
-          主要被反映人姓名: "",
+          线索来源: "",
+          承办单位: "",
+          sort: "",
         };
       }
       this.page = { pageSize: 10, pageNum: 1 };

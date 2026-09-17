@@ -62,17 +62,92 @@ function vwToPx(vwVal) {
 }
 
 function filterEmptyObj(arr) {
-  return arr.filter(item => {
+  return arr.filter((item) => {
     // 跳过非对象
-    if (typeof item !== 'object' || item === null) return true;
+    if (typeof item !== "object" || item === null) return true;
     // 取出对象所有value
     const values = Object.values(item);
     // 判断：是否至少有一项不为空（''、null、undefined 视为空）
-    const hasValue = values.some(val => {
-      return val !== '' && val !== null && val !== undefined;
-    })
+    const hasValue = values.some((val) => {
+      return val !== "" && val !== null && val !== undefined;
+    });
     return hasValue;
-  })
+  });
+}
+/**
+ * 【6个月到期逻辑】
+ * @param {string} dateStr yyyy-MM-dd
+ * @returns {Object} {tip, isOver, remainDays}
+ * isOver：0=不足5个月；1=满5不足6个月；2=超过6个月
+ */
+function checkSixMonth(dateStr) {
+  const startDate = new Date(dateStr);
+  const now = new Date();
+  const sYear = startDate.getFullYear();
+  const sMonth = startDate.getMonth();
+  const sDay = startDate.getDate();
+  const nYear = now.getFullYear();
+  const nMonth = now.getMonth();
+  const nDay = now.getDate();
+
+  let diffMonth = (nYear - sYear) * 12 + (nMonth - sMonth);
+  if (nDay < sDay) diffMonth--;
+
+  let tip = "";
+  let remainDays = null;
+  let isOver = 0;
+  const targetDate = new Date(sYear, sMonth + 6, sDay);
+
+  if (diffMonth >= 6) {
+    isOver = 2;
+    const diffTime = now.getTime() - targetDate.getTime();
+    const overDays = Math.floor(diffTime / 86400000);
+    tip = `已超${overDays}天`;
+  } else if (diffMonth >= 5) {
+    isOver = 1;
+    const diffTime = targetDate.getTime() - now.getTime();
+    remainDays = Math.ceil(diffTime / 86400000);
+    tip = `${remainDays}天后到期`;
+  }
+  return { tip, isOver, remainDays };
+}
+
+/**
+ * 【12个月到期逻辑】
+ * @param {string} dateStr yyyy-MM-dd
+ * @returns {Object} {tip, isOver, remainDays}
+ * isOver：0=不足11个月；1=满11不足12个月；2=超过12个月
+ */
+function checkTwelveMonth(dateStr) {
+  const startDate = new Date(dateStr);
+  const now = new Date();
+  const sYear = startDate.getFullYear();
+  const sMonth = startDate.getMonth();
+  const sDay = startDate.getDate();
+  const nYear = now.getFullYear();
+  const nMonth = now.getMonth();
+  const nDay = now.getDate();
+
+  let diffMonth = (nYear - sYear) * 12 + (nMonth - sMonth);
+  if (nDay < sDay) diffMonth--;
+
+  let tip = "";
+  let remainDays = null;
+  let isOver = 0;
+  const targetDate = new Date(sYear, sMonth + 12, sDay);
+
+  if (diffMonth >= 12) {
+    isOver = 2;
+    const diffTime = now.getTime() - targetDate.getTime();
+    const overDays = Math.floor(diffTime / 86400000);
+    tip = `已超${overDays}天`;
+  } else if (diffMonth >= 11) {
+    isOver = 1;
+    const diffTime = targetDate.getTime() - now.getTime();
+    remainDays = Math.ceil(diffTime / 86400000);
+    tip = `${remainDays}天后到期`;
+  }
+  return { tip, isOver, remainDays };
 }
 
 module.exports = {
@@ -82,5 +157,7 @@ module.exports = {
   filterEmptyObj,
   formatExcelDate,
   isMobileDevice,
+  checkSixMonth,
+  checkTwelveMonth,
   fromAccountGetPassword,
 };
