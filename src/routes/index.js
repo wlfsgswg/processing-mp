@@ -17,9 +17,9 @@ const routes = [
                     import("@/containers/Menu/Data/DataImport/index.vue"),
             },
             {
-                path: "/data/show",
+                path: "/data/table",
                 component: () =>
-                    import("@/containers/Menu/Data/DataShow/index.vue"),
+                    import("@/containers/Menu/Data/DataTable/index.vue"),
             },
             // system
             {

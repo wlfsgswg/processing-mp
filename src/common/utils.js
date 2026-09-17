@@ -51,7 +51,18 @@ const guid = () => {
   });
 };
 
+/**
+ * vw 转 px
+ * @param {number} vwVal vw数值，比如100代表100vw
+ * @returns {number} px
+ */
+function vwToPx(vwVal) {
+  const viewportWidth = window.innerWidth;
+  return (vwVal / 100) * viewportWidth;
+}
+
 module.exports = {
+  vwToPx,
   guid,
   createNewXlsx,
   formatExcelDate,

@@ -13,10 +13,6 @@ const listMenu = [
         key: "/data/import",
         title: "数据导入",
       },
-      // {
-      //   key: "/data/show",
-      //   title: "数据展示",
-      // },
     ],
   },
   {

@@ -11,6 +11,18 @@ const requestAddressList = [
     url: "/api/create/table",
     type: "post",
   },
+  {
+    describe: "导入数据",
+    method: "importData",
+    url: "/api/import/data",
+    type: "post",
+  },
+   {
+    describe: "查询数据",
+    method: "queryTableData",
+    url: "/api/query/tableData",
+    type: "post",
+  },
 ];
 
 const API = {};
