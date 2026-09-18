@@ -75,7 +75,7 @@ export default {
         encode: { x: "承办单位", y: "未办结" },
         labels: [
           {
-            text: (datum) => `未办结${datum.未办结}`,
+            text: (datum) => (datum.未办结 ? `未办结${datum.未办结}` : ""),
             position: "top", // top = 柱子**外侧上方**
             dy: -16, // ✅ G2v5 垂直偏移用 dy！正数向上
             // 不要加 contrastReverse！一加就自动塞柱子里面
@@ -99,6 +99,21 @@ export default {
         },
       });
       chart.render();
+      // 监听柱子点击
+      chart.on("interval:dblclick", (ev) => {
+        // 拿到当前点击柱子的原始数据
+        const data = ev.data.data;
+        // 双击监听，打开table页面，赋予特定选项
+        const routeObj = this.$router.resolve({
+          path: "/data/table",
+          query: {
+            name: this.tablename,
+            // 强制兜底，undefined转为空字符串，保证参数一定会带上url
+            department: data.承办单位 ?? "",
+          },
+        });
+        window.open(routeObj.href, "_blank");
+      });
       this[`chart_${para}`] = chart;
     },
     // 请求
@@ -145,9 +160,9 @@ export default {
             }
 
             let depKey = key
-              .replace(/平舆县纪委监委/g, "")
-              .replace(/平舆县/g, "")
-              .replace(/纪委监委/g, "");
+              // .replace(/平舆县纪委监委/g, "")
+              // .replace(/平舆县/g, "")
+              // .replace(/纪委监委/g, "");
 
             let item = {
               承办单位: depKey,

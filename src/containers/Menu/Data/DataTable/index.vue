@@ -1,8 +1,10 @@
 <template>
   <div class="xcx-data-datatable">
-    <Title title="数据列表"></Title>
+    <div class="p-b-20">
+      <Title title="数据列表"></Title>
+    </div>
     <!-- 条件搜索 -->
-    <div class="search">
+    <div class="search" v-if="isShowSearch">
       <div class="p-b-20">
         <el-row>
           <el-col :span="8">
@@ -117,7 +119,7 @@
           导出数据</el-button
         >
       </div>
-      <div class="r-right">
+      <div class="r-right" v-if="isShowSearch">
         <el-button type="primary" size="small" @click="handleSkip">
           图表展示</el-button
         >
@@ -288,6 +290,8 @@ export default {
     // 选项框
     keys: [],
     checkedCell: headerBasicCell,
+    // 判断跳转过来
+    isShowSearch: true,
   }),
   components: {
     Title,
@@ -296,9 +300,16 @@ export default {
   mounted() {
     // 获取参数名字
     this.tablename = this.$route.query.name;
+    if (this.$route.query.department) {
+      this.search.承办单位 = this.$route.query.department;
+      this.page.pageSize = 50;
+      this.isShowSearch = false;
+      this.keys = ["承办单位"];
+    } else {
+      this.handleQueryDistinctField("线索来源");
+      this.handleQueryDistinctField("承办单位");
+    }
     this.handleQueryTableData();
-    this.handleQueryDistinctField("线索来源");
-    this.handleQueryDistinctField("承办单位");
   },
   methods: {
     // 跳转到图表展示页面
