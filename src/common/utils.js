@@ -149,10 +149,20 @@ function checkTwelveMonth(dateStr) {
   }
   return { tip, isOver, remainDays };
 }
-
+/**
+ * 判断字符串是否包含数组内任意一项
+ * @param {string} str 待检测字符串
+ * @param {string[]} arr 关键词数组 ['镇','乡','街道']
+ * @returns {boolean}
+ */
+function hasAnyWord(str, arr) {
+  if (!str) return false;
+  return arr.some((word) => str.includes(word));
+}
 module.exports = {
   vwToPx,
   guid,
+  hasAnyWord,
   createNewXlsx,
   filterEmptyObj,
   formatExcelDate,

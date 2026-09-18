@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@achrinza/node-ipc": "^9.2.10",
-    "@antv/g2": "^4.2.10",
+    "@antv/g2": "^5.4.8",
     "@antv/g2plot": "^2.4.25",
     "axios": "^1.5.0",
     "core-js": "^3.6.4",
