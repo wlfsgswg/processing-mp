@@ -64,7 +64,6 @@ export default {
         this[`chart_${para}`].destroy();
         this[`chart_${para}`] = null;
       }
-      // autoFit移到new Chart这里
       const chart = new Chart({
         container: `container_${para}`,
         autoFit: true,
@@ -72,13 +71,15 @@ export default {
       chart.options({
         type: "interval",
         data: chartJson,
-        encode: { x: "承办单位", y: "未办结" },
+        encode: { x: "承办单位", y: "value", color: "type" },
+        // ✅核心：dodgeX 实现并排分组柱状图
+        transform: [{ type: "dodgeX" }],
+        color: ["#1677ff", "#13c2c2"],
         labels: [
           {
-            text: (datum) => (datum.未办结 ? `未办结${datum.未办结}` : ""),
-            position: "top", // top = 柱子**外侧上方**
-            dy: -16, // ✅ G2v5 垂直偏移用 dy！正数向上
-            // 不要加 contrastReverse！一加就自动塞柱子里面
+            text: (datum) => (datum.value ? `${datum.value}` : ""),
+            position: "top",
+            dy: -16,
             style: {
               fill: "red",
               fontSize: 12,
@@ -86,6 +87,9 @@ export default {
             },
           },
         ],
+        legend: {
+          position: "top-left",
+        },
         axis: {
           x: {
             labelTransform: "rotate(-70)",
@@ -94,15 +98,17 @@ export default {
             labelFontSize: 11,
           },
           y: {
-            title: { text: "未办结" },
+            title: { text: "数量" },
           },
         },
       });
       chart.render();
+
       // 监听柱子点击
       chart.on("interval:dblclick", (ev) => {
         // 拿到当前点击柱子的原始数据
         const data = ev.data.data;
+        console.log(data);
         // 双击监听，打开table页面，赋予特定选项
         const routeObj = this.$router.resolve({
           path: "/data/table",
@@ -110,6 +116,8 @@ export default {
             name: this.tablename,
             // 强制兜底，undefined转为空字符串，保证参数一定会带上url
             department: data.承办单位 ?? "",
+            type: data.type,
+            value: data.value,
           },
         });
         window.open(routeObj.href, "_blank");
@@ -147,39 +155,52 @@ export default {
             const element = obj[key];
             // 办结
             let complete = 0;
-            // 立案
-            let caseFiling = 0;
-            // 处理处分
-            let discipline = 0;
-            // 留置
-            let detain = 0;
+            // // 立案
+            // let caseFiling = 0;
+            // // 处理处分
+            // let discipline = 0;
+            // // 留置
+            // let detain = 0;
 
             for (let index = 0; index < element.length; index++) {
               const el = element[index];
               if (el.是否查结 === "是") complete++;
             }
 
-            let depKey = key
-              // .replace(/平舆县纪委监委/g, "")
-              // .replace(/平舆县/g, "")
-              // .replace(/纪委监委/g, "");
+            let depKey = key;
+            // .replace(/平舆县纪委监委/g, "")
+            // .replace(/平舆县/g, "")
+            // .replace(/纪委监委/g, "");
 
-            let item = {
+            // let item = {
+            //   承办单位: depKey,
+            //   办结: complete,
+            //   未办结: element.length - complete,
+            //   所有件: element || [],
+            //   立案: caseFiling,
+            //   处理处分: discipline,
+            //   留置: detain,
+            // };
+            let item1 = {
               承办单位: depKey,
-              办结: complete,
-              未办结: element.length - complete,
-              所有件: element || [],
-              立案: caseFiling,
-              处理处分: discipline,
-              留置: detain,
+              value: complete,
+              type: "办结",
+            };
+            let item2 = {
+              承办单位: depKey,
+              value: element.length - complete,
+              type: "未办结",
             };
             // 区分机关、派驻、乡镇
             if (hasAnyWord(depKey, ["镇", "乡", "街道"])) {
-              chartJsonXZ.push(item);
+              chartJsonXZ.push(item1);
+              chartJsonXZ.push(item2);
             } else if (hasAnyWord(depKey, ["派驻"])) {
-              chartJsonPZ.push(item);
+              chartJsonPZ.push(item1);
+              chartJsonPZ.push(item2);
             } else {
-              chartJsonJG.push(item);
+              chartJsonJG.push(item1);
+              chartJsonJG.push(item2);
             }
           }
           this.obj = obj;

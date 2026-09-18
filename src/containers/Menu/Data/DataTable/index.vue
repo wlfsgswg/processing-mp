@@ -3,6 +3,15 @@
     <div class="p-b-20">
       <Title title="数据列表"></Title>
     </div>
+    <div class="p-b-20 data-department" v-if="!isShowSearch">
+      承办单位：{{ query.department }}，总计：<span class="red p-r-5">
+        {{ total }} </span
+      >件，已办结：<span class="red p-r-5">
+        {{ query.type === "办结" ? query.value : total - query.value }} </span
+      >件，未办结：<span class="red p-r-5">
+        {{ query.type === "未办结" ? query.value : total - query.value }} </span
+      >件
+    </div>
     <!-- 条件搜索 -->
     <div class="search" v-if="isShowSearch">
       <div class="p-b-20">
@@ -292,6 +301,11 @@ export default {
     checkedCell: headerBasicCell,
     // 判断跳转过来
     isShowSearch: true,
+    query: {
+      department: "",
+      type: "",
+      value: "",
+    },
   }),
   components: {
     Title,
@@ -301,7 +315,9 @@ export default {
     // 获取参数名字
     this.tablename = this.$route.query.name;
     if (this.$route.query.department) {
-      this.search.承办单位 = this.$route.query.department;
+      let { department, type, value } = this.$route.query;
+      this.query = { department, type, value };
+      this.search.承办单位 = department;
       this.page.pageSize = 50;
       this.isShowSearch = false;
       this.keys = ["承办单位"];
