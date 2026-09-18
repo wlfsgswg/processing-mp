@@ -265,7 +265,7 @@ import {
   headerBasicCell,
   headerBasicCellScope,
 } from "@/common/const";
-import { checkSixMonth, checkTwelveMonth } from "@/common/utils";
+import { checkSixMonth, checkTwelveMonth, createNewXlsx } from "@/common/utils";
 import { mapState } from "vuex";
 
 export default {
@@ -351,7 +351,9 @@ export default {
       this.tableColumns = tableColumns;
     },
     // 导出数据
-    handleImport() {},
+    handleImport() {
+      createNewXlsx(this.list)
+    },
     // 请求
     handleQueryTableData() {
       this.loading = true;
