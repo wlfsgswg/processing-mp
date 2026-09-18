@@ -260,11 +260,7 @@
 <script>
 import "./index.less";
 import { Title, Dialog } from "@/components";
-import {
-  pickerOptions,
-  headerBasicCell,
-  headerBasicCellScope,
-} from "@/common/const";
+import { headerBasicCell, headerBasicCellScope } from "@/common/const";
 import { checkSixMonth, checkTwelveMonth, createNewXlsx } from "@/common/utils";
 import { mapState } from "vuex";
 
@@ -272,13 +268,6 @@ export default {
   data: () => ({
     tableColumns: [],
     tablename: "",
-    pickerOptions,
-    sgDynasty: [
-      {
-        name: "三国",
-        value: "1",
-      },
-    ],
     loading: false,
     list: [],
     total: 0,
@@ -352,7 +341,7 @@ export default {
     },
     // 导出数据
     handleImport() {
-      createNewXlsx(this.list)
+      createNewXlsx(this.list);
     },
     // 请求
     handleQueryTableData() {
@@ -368,17 +357,18 @@ export default {
           // 对list进行处理
           for (let a = 0; a < res.list.length; a++) {
             const e = res.list[a];
-            e.受理日期obj = checkSixMonth(e.受理日期);
+            e.受理日期obj =
+              e.办结日期 === "是" ? { isOver: 0 } : checkSixMonth(e.受理日期);
+
             e.初次处置日期obj =
-              e.是否立案 === "是"
+              e.是否立案 === "是" || e.办结日期 === "是"
                 ? { isOver: 0 }
                 : checkSixMonth(e.初次处置日期);
+
             e.立案日期obj =
               e.办结日期 === "是"
                 ? { isOver: 0 }
                 : checkTwelveMonth(e.立案日期);
-
-            console.log(e);
           }
 
           this.list = res.list || [];

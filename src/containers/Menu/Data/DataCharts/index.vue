@@ -108,7 +108,6 @@ export default {
       chart.on("interval:dblclick", (ev) => {
         // 拿到当前点击柱子的原始数据
         const data = ev.data.data;
-        console.log(data);
         // 双击监听，打开table页面，赋予特定选项
         const routeObj = this.$router.resolve({
           path: "/data/table",

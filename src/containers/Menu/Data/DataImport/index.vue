@@ -216,7 +216,6 @@ export default {
       });
       const headers = list.length ? Object.keys(list[0]) : [];
       this.list = filterEmptyObj(list);
-      console.log("list", this.list);
       this.headers = headers;
     },
     handleFileChange(fileObj, fileList) {
