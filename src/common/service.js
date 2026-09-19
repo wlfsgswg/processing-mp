@@ -2,7 +2,7 @@ import axios from "axios";
 import { Message } from "element-ui";
 import Cookies from "js-cookie";
 
-const baseURL = "/";
+const baseURL = process.env.VUE_APP_API_BASE;
 const CODE = {
   ERROR_CODE: -1,
   SUCCESS_CODE: 200,

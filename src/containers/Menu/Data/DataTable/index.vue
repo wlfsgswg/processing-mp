@@ -358,15 +358,15 @@ export default {
           for (let a = 0; a < res.list.length; a++) {
             const e = res.list[a];
             e.受理日期obj =
-              e.办结日期 === "是" ? { isOver: 0 } : checkSixMonth(e.受理日期);
+              e.是否查结 === "是" ? { isOver: 0 } : checkSixMonth(e.受理日期);
 
             e.初次处置日期obj =
-              e.是否立案 === "是" || e.办结日期 === "是"
+              e.是否立案 === "是" || e.是否查结 === "是"
                 ? { isOver: 0 }
                 : checkSixMonth(e.初次处置日期);
 
             e.立案日期obj =
-              e.办结日期 === "是"
+              e.是否查结 === "是"
                 ? { isOver: 0 }
                 : checkTwelveMonth(e.立案日期);
           }
