@@ -1,7 +1,8 @@
 const routes = [
   {
     path: "/",
-    redirect: "/home",
+    // redirect: "/home",
+    redirect: "/data/import",
     component: () => import("@/containers/Menu/index.vue"),
     children: [
       // {

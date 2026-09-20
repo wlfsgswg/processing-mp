@@ -75,10 +75,6 @@ export default {
     total: 0,
     columns: [
       {
-        label: "ID",
-        prop: "id",
-      },
-      {
         label: "表名",
         prop: "name",
       },
