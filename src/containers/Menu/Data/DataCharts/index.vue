@@ -1,18 +1,27 @@
 <template>
   <div class="xcx-data-datacharts">
-    <Title title="乡镇数据"></Title>
-    <div class="p-t-20 p-b-20">
+    <div>
+      <Title title="数据展示"></Title>
       <div
-        class="container_content"
+        class="p-t-20 p-b-20 clearfix"
         v-loading="loading"
         element-loading-text="拼命加载中"
         element-loading-spinner="el-icon-loading"
         element-loading-background="rgba(255, 255, 255, 0.3)"
       >
-        <div id="container_xz" style="width: 100%; height: 550"></div>
+        <div class="l-left">
+          <el-button type="primary" size="small" @click="handleImport">
+            导出数据</el-button
+          >
+        </div>
+        <div class="r-right">
+          <el-button type="primary" size="small" @click="printChart">
+            打印图表</el-button
+          >
+        </div>
       </div>
     </div>
-    <Title title="派驻数据"></Title>
+    <Title title="乡镇街道"></Title>
     <div class="p-t-20 p-b-20">
       <div
         class="container_content"
@@ -21,10 +30,10 @@
         element-loading-spinner="el-icon-loading"
         element-loading-background="rgba(255, 255, 255, 0.3)"
       >
-        <div id="container_pz" style="width: 100%; height: 550"></div>
+        <div id="container_xz" style="width: 100%; height: 480px"></div>
       </div>
     </div>
-    <Title title="机关数据"></Title>
+    <Title title="派驻机关"></Title>
     <div class="p-t-20 p-b-20">
       <div
         class="container_content"
@@ -33,7 +42,19 @@
         element-loading-spinner="el-icon-loading"
         element-loading-background="rgba(255, 255, 255, 0.3)"
       >
-        <div id="container_jg" style="width: 100%; height: 550"></div>
+        <div id="container_pz" style="width: 100%; height: 480"></div>
+      </div>
+    </div>
+    <Title title="机关单位"></Title>
+    <div class="p-t-20 p-b-20">
+      <div
+        class="container_content"
+        v-loading="loading"
+        element-loading-text="拼命加载中"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="rgba(255, 255, 255, 0.3)"
+      >
+        <div id="container_jg" style="width: 100%; height: 480"></div>
       </div>
     </div>
   </div>
@@ -44,7 +65,11 @@ import "./index.less";
 import { Title } from "@/components";
 import { mapState } from "vuex";
 import { Chart } from "@antv/g2";
-import { hasAnyWord, sortByChengbanDanwei } from "@/common/utils.js";
+import {
+  hasAnyWord,
+  sortByChengbanDanwei,
+  createNewXlsx,
+} from "@/common/utils.js";
 export default {
   data: () => ({
     tablename: "",
@@ -56,6 +81,7 @@ export default {
     chart_xz: null,
     chart_pz: null,
     chart_jg: null,
+    importData: [],
   }),
   components: {
     Title,
@@ -73,6 +99,76 @@ export default {
     }
   },
   methods: {
+    // 导出数据
+    handleImport() {
+      // 处理数据，显示
+      createNewXlsx(this.importData, "承办单位执纪执法数据");
+    },
+    async printChart() {
+      try {
+        // 三个图表容器ID，按你的实际dom修改
+        const ids = ["container_xz", "container_pz", "container_jg"];
+        const imgList = [];
+
+        // 循环取出每个canvas，转图片
+        for (const id of ids) {
+          const wrap = document.getElementById(id);
+          if (!wrap) continue;
+          const canvas = wrap.querySelector("canvas");
+          if (!canvas) continue;
+          // 质量0.6，平衡清晰度和速度
+          const imgSrc = canvas.toDataURL("image/png", 0.6);
+          imgList.push(imgSrc);
+        }
+
+        if (imgList.length === 0) {
+          this.$message.warning("没有可打印的图表！");
+          return;
+        }
+
+        // 拼接图片html，多张图上下排列
+        let imgHtml = "";
+        imgList.forEach((src) => {
+          imgHtml += `<img src="${src}" style="width:100%;display:block;margin-bottom:24px;">`;
+        });
+
+        // 新开打印窗口
+        const printWin = window.open("", "_blank", "width=1200,height=900");
+        printWin.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>打印图表</title>
+        <style>
+          body { margin: 0; padding: 16px; }
+          @page {
+            size: A4 landscape;
+            margin:10mm;
+          }
+        </style>
+      </head>
+      <body>
+        ${imgHtml}
+      </body>
+      </html>
+    `);
+        printWin.document.close();
+
+        // 等待最后一张图片加载完成
+        const lastImg = new Image();
+        lastImg.src = imgList[imgList.length - 1];
+        lastImg.onload = () => {
+          setTimeout(() => {
+            printWin.print();
+            printWin.close();
+          }, 200);
+        };
+      } catch (err) {
+        console.error("打印异常：", err);
+        this.$message.error("打印失败");
+      }
+    },
     // 生成Chart图
     renderChart(chartJson, para) {
       if (this[`chart_${para}`]) {
@@ -199,6 +295,7 @@ export default {
           let chartJsonJG = [];
           let chartJsonPZ = [];
           let chartJsonXZ = [];
+          let importData = [];
           // 整理最终数据
           for (const key in obj) {
             if (!Object.hasOwn(obj, key)) continue;
@@ -298,7 +395,18 @@ export default {
               chartJsonJG.push(item6);
               chartJsonJG.push(item7);
             }
+            importData.push({
+              承办单位: depKey,
+              办结: complete,
+              未办结: element.length - complete,
+              立案件数: caseFiling,
+              立案人数: caseFilingPeople,
+              留置件数: detain,
+              留置人数: detainPeople,
+              处理处分人数: discipline,
+            });
           }
+          this.importData = importData;
           this.obj = obj;
           this.total = res.total || 0;
           chartJsonJG = sortByChengbanDanwei(chartJsonJG);

@@ -142,7 +142,7 @@
       </div>
       <div class="r-right" v-if="isShowSearch">
         <el-button type="primary" size="small" @click="handleSkip">
-          图表展示</el-button
+          数据展示</el-button
         >
       </div>
     </div>
@@ -340,7 +340,7 @@ export default {
     this.handleQueryTableData();
   },
   _methods: {
-    // 跳转到图表展示页面
+    // 跳转到数据展示页面
     handleSkip() {
       this.$router.push({
         path: "/data/charts",

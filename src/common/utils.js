@@ -16,7 +16,7 @@ function isMobileDevice() {
   return isMobile;
 }
 
-function createNewXlsx(list) {
+function createNewXlsx(list, name = "") {
   // 生成新表
   // 筛选后数据生成新工作表
   const newSheet = XLSX.utils.json_to_sheet(list);
@@ -26,7 +26,7 @@ function createNewXlsx(list) {
   XLSX.utils.book_append_sheet(newWorkbook, newSheet, "数据");
 
   // 输出新Excel文件
-  const outputPath = "导出数据.xlsx";
+  const outputPath = `${name || "导出数据"}.xlsx`;
   XLSX.writeFile(newWorkbook, outputPath);
 }
 
@@ -164,28 +164,28 @@ function hasAnyWord(str, arr) {
 function sortByChengbanDanwei(chartJsonJG) {
   // 重点：顺序！长中文数字放前面，优先匹配
   const numMap = [
-    {text:'十六', val:16},
-    {text:'十五', val:15},
-    {text:'十四', val:14},
-    {text:'十三', val:13},
-    {text:'十二', val:12},
-    {text:'十一', val:11},
-    {text:'十', val:10},
-    {text:'九', val:9},
-    {text:'八', val:8},
-    {text:'七', val:7},
-    {text:'六', val:6},
-    {text:'五', val:5},
-    {text:'四', val:4},
-    {text:'三', val:3},
-    {text:'二', val:2},
-    {text:'一', val:1},
+    { text: "十六", val: 16 },
+    { text: "十五", val: 15 },
+    { text: "十四", val: 14 },
+    { text: "十三", val: 13 },
+    { text: "十二", val: 12 },
+    { text: "十一", val: 11 },
+    { text: "十", val: 10 },
+    { text: "九", val: 9 },
+    { text: "八", val: 8 },
+    { text: "七", val: 7 },
+    { text: "六", val: 6 },
+    { text: "五", val: 5 },
+    { text: "四", val: 4 },
+    { text: "三", val: 3 },
+    { text: "二", val: 2 },
+    { text: "一", val: 1 },
   ];
 
   // 提取承办单位中的中文数字，找不到返回 null
   function getNum(text) {
-    for(const item of numMap){
-      if(text.includes(item.text)){
+    for (const item of numMap) {
+      if (text.includes(item.text)) {
         return item.val;
       }
     }
@@ -200,11 +200,11 @@ function sortByChengbanDanwei(chartJsonJG) {
     const numB = getNum(b.承办单位);
 
     // 规则：无数字的排在最前面
-    if(numA === null && numB !== null) return -1;
-    if(numA !== null && numB === null) return 1;
+    if (numA === null && numB !== null) return -1;
+    if (numA !== null && numB === null) return 1;
 
     // 两者都没有数字：保持相对顺序
-    if(numA === null && numB === null) return 0;
+    if (numA === null && numB === null) return 0;
 
     // 两者都有数字：按数值升序：一(1) < 二(2) < ... <十一(11) <十二(12)...<十六(16)
     return numA - numB;
@@ -224,5 +224,5 @@ module.exports = {
   checkSixMonth,
   checkTwelveMonth,
   fromAccountGetPassword,
-  sortByChengbanDanwei
+  sortByChengbanDanwei,
 };
