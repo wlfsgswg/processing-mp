@@ -29,6 +29,36 @@ const requestAddressList = [
     url: "/api/query/distinctField",
     type: "post",
   },
+  {
+    describe: "新增表",
+    method: "statAdd",
+    url: "/api/stat/add",
+    type: "post",
+  },
+  {
+    describe: "查询历史表",
+    method: "statList",
+    url: "/api/stat/list",
+    type: "post",
+  },
+  {
+    describe: "删除表",
+    method: "statDel",
+    url: "/api/stat/del",
+    type: "post",
+  },
+  {
+    describe: "更新total",
+    method: "statUpdate",
+    url: "/api/stat/updateTotal",
+    type: "post",
+  },
+  {
+    describe: "删除表",
+    method: "dbDropTable",
+    url: "/api/db/dropTable",
+    type: "post",
+  },
 ];
 
 const API = {};

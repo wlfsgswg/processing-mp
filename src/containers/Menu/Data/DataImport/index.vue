@@ -253,6 +253,10 @@ export default {
                 message: res.message || "创建成功",
               });
               this.isHadTable = true;
+              // 需要把该条数据筛到数据表中
+              this.$API.statAdd({
+                name: this.tablename,
+              });
             });
         })
         .catch(() => {
@@ -275,6 +279,11 @@ export default {
             message: res.message || "创建成功",
           });
           this.isHadImport = true;
+          // 需要把该条数据筛到数据表中
+          this.$API.statUpdate({
+            name: this.tablename,
+            total: this.list.length,
+          });
         });
     },
     // 跳转到数据展示页面

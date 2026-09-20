@@ -226,7 +226,7 @@
 
               <!--  -->
             </div>
-            <span v-else>{{ scope.row[item.prop] }}</span>
+            <div v-else>{{ scope.row[item.prop] }}</div>
           </template>
         </el-table-column>
       </el-table>
