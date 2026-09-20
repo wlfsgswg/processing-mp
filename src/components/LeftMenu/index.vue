@@ -51,7 +51,8 @@ export default {
   data: () => ({
     Logo,
     listMenu: [...listMenu],
-    focus: "/home",
+    // focus: "/home",
+    focus: "/data/import",
     openKeys: [],
   }),
   mounted() {

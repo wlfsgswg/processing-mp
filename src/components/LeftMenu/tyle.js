@@ -1,9 +1,9 @@
 const listMenu = [
-  {
-    key: "/home",
-    icon: "el-icon-data-line",
-    title: "首页",
-  },
+  // {
+  //   key: "/home",
+  //   icon: "el-icon-data-line",
+  //   title: "首页",
+  // },
   {
     key: "/data",
     icon: "el-icon-tickets",

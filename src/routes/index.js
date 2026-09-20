@@ -4,10 +4,10 @@ const routes = [
     redirect: "/home",
     component: () => import("@/containers/Menu/index.vue"),
     children: [
-      {
-        path: "/home",
-        component: () => import("@/containers/Menu/Home/index.vue"),
-      },
+      // {
+      //   path: "/home",
+      //   component: () => import("@/containers/Menu/Home/index.vue"),
+      // },
       // data
       {
         path: "/data/import",

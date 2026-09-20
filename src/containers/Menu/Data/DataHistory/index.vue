@@ -120,21 +120,30 @@ export default {
     },
     // 删除
     handleDelete(e) {
-      //请求ajax删除
-      this.$API.statDel({ id: e.id }).then(() => {
-        this.$message({ message: `已删除`, type: "success" });
-        // 重新请求页面，如果刚好删除某页的最后一条，往前翻一页，如果第一页则不操作
-        const { pageSize, pageNum } = this.page;
-        const total = this.total;
-        if (pageNum !== 1 && total % pageSize === 1) {
-          this.page.pageNum = this.page.pageNum - 1;
-        }
-        this.handleQueryStatList();
-        // 还需要删除特定表
-        this.$API.dbDropTable({
-          tableName: e.name,
-        });
-      });
+      this.$confirm("删除内容后将不能恢复，确认删除？", "删除", {
+        distinguishCancelAndClose: true,
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        cancelButtonClass: "is-plain",
+      })
+        .then(() => {
+          //请求ajax删除
+          this.$API.statDel({ id: e.id }).then(() => {
+            this.$message({ message: `已删除`, type: "success" });
+            // 重新请求页面，如果刚好删除某页的最后一条，往前翻一页，如果第一页则不操作
+            const { pageSize, pageNum } = this.page;
+            const total = this.total;
+            if (pageNum !== 1 && total % pageSize === 1) {
+              this.page.pageNum = this.page.pageNum - 1;
+            }
+            this.handleQueryStatList();
+            // 还需要删除特定表
+            this.$API.dbDropTable({
+              tableName: e.name,
+            });
+          });
+        })
+        .catch(() => {});
     },
     handleQueryStatList() {
       this.$API
