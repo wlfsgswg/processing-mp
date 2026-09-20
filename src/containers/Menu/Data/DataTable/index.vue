@@ -4,13 +4,25 @@
       <Title title="数据列表"></Title>
     </div>
     <div class="p-b-20 data-department" v-if="!isShowSearch">
-      承办单位：{{ query.department }}，总计：<span class="red p-r-5">
-        {{ total }} </span
-      >件，已办结：<span class="red p-r-5">
-        {{ query.type === "办结" ? query.value : total - query.value }} </span
-      >件，未办结：<span class="red p-r-5">
-        {{ query.type === "未办结" ? query.value : total - query.value }} </span
-      >件
+      <div>承办单位：{{ query.department }}</div>
+      <div>
+        总计：<span class="red p-r-5"> {{ total }} </span>件，已办结：<span
+          class="red p-r-5"
+        >
+          {{ query.complete || 0 }} </span
+        >件，未办结：<span class="red p-r-5">
+          {{ total - query.complete || 0 }} </span
+        >件，立案件数：<span class="red p-r-5">
+          {{ query.caseFiling || 0 }} </span
+        >件，立案人数：<span class="red p-r-5">
+          {{ query.caseFilingPeople || 0 }} </span
+        >人，留置件数：<span class="red p-r-5"> {{ query.detain || 0 }} </span
+        >件，留置人数：<span class="red p-r-5">
+          {{ query.detainPeople || 0 }} </span
+        >人，处理处分人数：<span class="red p-r-5">
+          {{ query.discipline || 0 }} </span
+        >人
+      </div>
     </div>
     <!-- 条件搜索 -->
     <div class="search" v-if="isShowSearch">
@@ -294,6 +306,17 @@ export default {
       department: "",
       type: "",
       value: "",
+      // 办结
+      complete: "",
+      // 立案
+      caseFiling: "",
+      caseFilingPeople: "",
+      // 处理处分
+      discipline: "",
+      // 留置件数
+      detain: "",
+      // 留置人数
+      detainPeople: "",
     },
   }),
   components: {
@@ -302,10 +325,10 @@ export default {
   },
   mounted() {
     // 获取参数名字
-    this.tablename = this.$route.query.name;
-    if (this.$route.query.department) {
-      let { department, type, value } = this.$route.query;
-      this.query = { department, type, value };
+    let { name, department } = this.$route.query;
+    this.tablename = name;
+    if (department) {
+      this.query.department = department;
       this.search.承办单位 = department;
       this.page.pageSize = 50;
       this.isShowSearch = false;
@@ -316,7 +339,7 @@ export default {
     }
     this.handleQueryTableData();
   },
-  methods: {
+  _methods: {
     // 跳转到图表展示页面
     handleSkip() {
       this.$router.push({
@@ -373,7 +396,7 @@ export default {
 
           this.list = res.list || [];
           this.total = res.total || 0;
-          this.loading = false;
+
           const keys = Object.keys(this.list[0] || {}).slice(1);
           this.keys = keys;
           if (!this.tableColumns.length) {
@@ -388,6 +411,51 @@ export default {
               });
             }
             this.tableColumns = tableColumns;
+            // 判断当参数带“承办单位”时，需要获取7大参数并赋值
+            // 办结
+            let complete = 0;
+            // 立案
+            let caseFiling = 0;
+            let caseFilingPeople = 0;
+            // 处理处分
+            let discipline = 0;
+            // 留置件数
+            let detain = 0;
+            // 留置人数
+            let detainPeople = 0;
+            if (!this.isShowSearch) {
+              for (let index = 0; index < this.list.length; index++) {
+                const el = this.list[index];
+                if (el.是否查结 === "是") complete++;
+                // 立案件数
+                if (el.是否立案 === "是") caseFiling++;
+                // 立案人数
+                caseFilingPeople = caseFilingPeople + (el.立案人数 - 0);
+                // 留置件数
+                if (el.是否采取留置措施 === "是") detain++;
+                // 留置人数
+                detainPeople = detainPeople + (el.留置人数 - 0);
+                // 处理处分人数
+                discipline =
+                  discipline +
+                  (el.第一种形态 -
+                    0 +
+                    (el.第二种形态 - 0) +
+                    (el.第三种形态 - 0) +
+                    (el.第四种形态 - 0));
+              }
+              this.query = {
+                ...this.query,
+                complete,
+                caseFiling,
+                caseFilingPeople,
+                detain,
+                detainPeople,
+                discipline,
+              };
+            }
+
+            this.loading = false;
           }
         })
         .catch(() => {
@@ -434,6 +502,12 @@ export default {
       this.page.pageNum = val;
       this.handleQueryTableData();
     },
+  },
+  get methods() {
+    return this._methods;
+  },
+  set methods(value) {
+    this._methods = value;
   },
   computed: {
     ...mapState("global", ["globalInfo", "userInfo"]),

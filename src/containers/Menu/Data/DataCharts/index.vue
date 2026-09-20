@@ -3,23 +3,38 @@
     <Title title="乡镇数据"></Title>
     <div class="p-t-20 p-b-20">
       <div
-        id="container_xz"
-        style="width: 100%; height: 550; border: 1px solid #eee"
-      ></div>
+        class="container_content"
+        v-loading="loading"
+        element-loading-text="拼命加载中"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="rgba(255, 255, 255, 0.3)"
+      >
+        <div id="container_xz" style="width: 100%; height: 550"></div>
+      </div>
     </div>
     <Title title="派驻数据"></Title>
     <div class="p-t-20 p-b-20">
       <div
-        id="container_pz"
-        style="width: 100%; height: 550; border: 1px solid #eee"
-      ></div>
+        class="container_content"
+        v-loading="loading"
+        element-loading-text="拼命加载中"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="rgba(255, 255, 255, 0.3)"
+      >
+        <div id="container_pz" style="width: 100%; height: 550"></div>
+      </div>
     </div>
     <Title title="机关数据"></Title>
     <div class="p-t-20 p-b-20">
       <div
-        id="container_jg"
-        style="width: 100%; height: 550; border: 1px solid #eee"
-      ></div>
+        class="container_content"
+        v-loading="loading"
+        element-loading-text="拼命加载中"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="rgba(255, 255, 255, 0.3)"
+      >
+        <div id="container_jg" style="width: 100%; height: 550"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -33,7 +48,7 @@ import { hasAnyWord, sortByChengbanDanwei } from "@/common/utils.js";
 export default {
   data: () => ({
     tablename: "",
-    loading: false,
+    loading: true,
     obj: {},
     total: 0,
     sourceList: [],
@@ -154,8 +169,6 @@ export default {
           query: {
             name: this.tablename,
             department: data.承办单位 ?? "",
-            type: data.type,
-            value: data.value,
           },
         });
         window.open(routeObj.href, "_blank");
@@ -288,13 +301,12 @@ export default {
           }
           this.obj = obj;
           this.total = res.total || 0;
-          this.loading = false;
-          // console.log(chartJsonJG, "chartJsonJG");
           chartJsonJG = sortByChengbanDanwei(chartJsonJG);
           // 绘制图形
           this.renderChart(chartJsonXZ, "xz");
           this.renderChart(chartJsonPZ, "pz");
           this.renderChart(chartJsonJG, "jg");
+          this.loading = false;
         })
         .catch(() => {
           this.loading = false;
