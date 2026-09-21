@@ -141,8 +141,13 @@
         >
       </div>
       <div class="r-right" v-if="isShowSearch">
-        <el-button type="primary" size="small" @click="handleSkip">
-          数据展示</el-button
+        <el-button type="primary" size="small" @click="handleSkip(2)">
+          以线索来源展示数据</el-button
+        >
+      </div>
+      <div class="r-right p-r-20" v-if="isShowSearch">
+        <el-button type="primary" size="small" @click="handleSkip(1)">
+          以承办单位展示数据</el-button
         >
       </div>
     </div>
@@ -341,11 +346,12 @@ export default {
   },
   _methods: {
     // 跳转到数据展示页面
-    handleSkip() {
+    handleSkip(type) {
       this.$router.push({
         path: "/data/charts",
         query: {
           name: this.tablename,
+          type,
         },
       });
     },

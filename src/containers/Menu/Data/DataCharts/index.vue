@@ -1,60 +1,77 @@
 <template>
   <div class="xcx-data-datacharts">
-    <div>
-      <Title title="数据展示"></Title>
-      <div
-        class="p-t-20 p-b-20 clearfix"
-        v-loading="loading"
-        element-loading-text="拼命加载中"
-        element-loading-spinner="el-icon-loading"
-        element-loading-background="rgba(255, 255, 255, 0.3)"
-      >
-        <div class="l-left">
-          <el-button type="primary" size="small" @click="handleImport">
-            导出数据</el-button
-          >
-        </div>
-        <div class="r-right">
-          <el-button type="primary" size="small" @click="printChart">
-            打印图表</el-button
-          >
+    <div v-if="type === 1">
+      <Title title="乡镇街道"></Title>
+      <div class="p-t-20 p-b-20">
+        <div
+          class="container_content"
+          v-loading="loading"
+          element-loading-text="拼命加载中"
+          element-loading-spinner="el-icon-loading"
+          element-loading-background="rgba(255, 255, 255, 0.3)"
+        >
+          <div id="container_xz" style="width: 100%; height: 480px"></div>
         </div>
       </div>
-    </div>
-    <Title title="乡镇街道"></Title>
-    <div class="p-t-20 p-b-20">
-      <div
-        class="container_content"
-        v-loading="loading"
-        element-loading-text="拼命加载中"
-        element-loading-spinner="el-icon-loading"
-        element-loading-background="rgba(255, 255, 255, 0.3)"
-      >
-        <div id="container_xz" style="width: 100%; height: 480px"></div>
+      <Title title="派驻机关"></Title>
+      <div class="p-t-20 p-b-20">
+        <div
+          class="container_content"
+          v-loading="loading"
+          element-loading-text="拼命加载中"
+          element-loading-spinner="el-icon-loading"
+          element-loading-background="rgba(255, 255, 255, 0.3)"
+        >
+          <div id="container_pz" style="width: 100%; height: 480"></div>
+        </div>
+      </div>
+      <Title title="机关单位"></Title>
+      <div class="p-t-20 p-b-20">
+        <div
+          class="container_content"
+          v-loading="loading"
+          element-loading-text="拼命加载中"
+          element-loading-spinner="el-icon-loading"
+          element-loading-background="rgba(255, 255, 255, 0.3)"
+        >
+          <div id="container_jg" style="width: 100%; height: 480"></div>
+        </div>
       </div>
     </div>
-    <Title title="派驻机关"></Title>
-    <div class="p-t-20 p-b-20">
-      <div
-        class="container_content"
-        v-loading="loading"
-        element-loading-text="拼命加载中"
-        element-loading-spinner="el-icon-loading"
-        element-loading-background="rgba(255, 255, 255, 0.3)"
-      >
-        <div id="container_pz" style="width: 100%; height: 480"></div>
+    <div v-else>
+      <Title title="线索来源"></Title>
+      <div class="p-t-20 p-b-20">
+        <div
+          class="container_content"
+          v-loading="loading"
+          element-loading-text="拼命加载中"
+          element-loading-spinner="el-icon-loading"
+          element-loading-background="rgba(255, 255, 255, 0.3)"
+        >
+          <div id="container_xsly" style="width: 100%; height: 480px"></div>
+        </div>
       </div>
     </div>
-    <Title title="机关单位"></Title>
-    <div class="p-t-20 p-b-20">
-      <div
-        class="container_content"
-        v-loading="loading"
-        element-loading-text="拼命加载中"
-        element-loading-spinner="el-icon-loading"
-        element-loading-background="rgba(255, 255, 255, 0.3)"
-      >
-        <div id="container_jg" style="width: 100%; height: 480"></div>
+    <div
+      class="clearfix"
+      v-loading="loading"
+      element-loading-text="拼命加载中"
+      element-loading-spinner="el-icon-loading"
+      element-loading-background="rgba(255, 255, 255, 0.3)"
+    >
+      <div class="l-left">
+        <el-button type="primary" size="small" @click="handleImport">
+          {{
+            `${this.type === 1 ? "承办单位" : "线索来源"}执纪执法数据`
+          }}</el-button
+        >
+      </div>
+      <div class="r-right">
+        <el-button type="primary" size="small" @click="printChart">
+          {{
+            `打印${this.type === 1 ? "承办单位" : "线索来源"}执纪执法图表`
+          }}</el-button
+        >
       </div>
     </div>
   </div>
@@ -73,6 +90,7 @@ import {
 export default {
   data: () => ({
     tablename: "",
+    type: 1,
     loading: true,
     obj: {},
     total: 0,
@@ -81,6 +99,8 @@ export default {
     chart_xz: null,
     chart_pz: null,
     chart_jg: null,
+    // 线索来源
+    chart_xsly: null,
     importData: [],
   }),
   components: {
@@ -89,8 +109,12 @@ export default {
   mounted() {
     // 获取参数名字
     this.tablename = this.$route.query.name;
-    this.handleQueryDistinctField("线索来源");
-    this.handleQueryDistinctField("承办单位");
+    this.type = this.$route.query.type - 0;
+    if (this.type === 1) {
+      this.handleQueryDistinctField("承办单位");
+    } else {
+      this.handleQueryDistinctField("线索来源");
+    }
   },
   beforeDestroy() {
     if (this.chart) {
@@ -102,12 +126,18 @@ export default {
     // 导出数据
     handleImport() {
       // 处理数据，显示
-      createNewXlsx(this.importData, "承办单位执纪执法数据");
+      createNewXlsx(
+        this.importData,
+        `${this.type === 1 ? "承办单位" : "线索来源"}执纪执法数据`,
+      );
     },
     async printChart() {
       try {
         // 三个图表容器ID，按你的实际dom修改
-        const ids = ["container_xz", "container_pz", "container_jg"];
+        const ids =
+          this.type === 1
+            ? ["container_xz", "container_pz", "container_jg"]
+            : ["container_xsly"];
         const imgList = [];
 
         // 循环取出每个canvas，转图片
@@ -154,7 +184,6 @@ export default {
       </html>
     `);
         printWin.document.close();
-
         // 等待最后一张图片加载完成
         const lastImg = new Image();
         lastImg.src = imgList[imgList.length - 1];
@@ -182,26 +211,35 @@ export default {
       chart.options({
         type: "interval",
         data: chartJson,
-        encode: { x: "承办单位", y: "value", color: "type" },
+        encode: {
+          x: this.type === 1 ? "承办单位" : "线索来源",
+          y: "value",
+          color: "type",
+        },
         // ✅核心：dodgeX 实现并排分组柱状图
         transform: [{ type: "dodgeX" }],
-        color: [
-          "#1677ff",
-          "#13c2c2",
-          "#fa8c16",
-          "#722ed1",
-          "#597ef7",
-          "#52c41a",
-          "#ad6800",
-        ],
-        // 重点！interaction.tooltip.shared = true
+        // ==========G25.x 自定义颜色写在这里！==========
+        scale: {
+          color: {
+            type: "ordinal",
+            range: [
+              "#165DFF",
+              "#00A86B",
+              "#FF7D45",
+              "#B19CD9",
+              "#CD5C5C",
+              "#C3B091",
+              "#71A0C9",
+            ],
+          },
+        },
         interaction: {
           tooltip: {
             shared: true,
           },
         },
         tooltip: {
-          title: "承办单位",
+          title: this.type === 1 ? "承办单位" : "线索来源",
           items: [
             (datum) => {
               return {
@@ -215,7 +253,7 @@ export default {
           {
             text: (datum) => (datum.value ? `${datum.value}` : ""),
             position: "top",
-            dy: -16,
+            dy: -14,
             style: {
               fill: "red",
               fontSize: 12,
@@ -241,9 +279,16 @@ export default {
       chart.render();
       // 改用 tooltip:change 事件！官方用来修改tooltip items的事件
       chart.on("tooltip:change", (ev) => {
-        // 获取当前悬浮的承办单位名称
-        const orgName = ev.items[0].data.承办单位;
-        const allRows = chartJson.filter((d) => d.承办单位 === orgName);
+        // 获取当前悬浮的承办单位/线索来源名称
+        let orgName;
+        let allRows;
+        if (this.type === 1) {
+          orgName = ev.items[0].data.承办单位;
+          allRows = chartJson.filter((d) => d.承办单位 === orgName);
+        } else {
+          orgName = ev.items[0].data.线索来源;
+          allRows = chartJson.filter((d) => d.线索来源 === orgName);
+        }
         // 清空原有items数组
         ev.items.splice(0, ev.items.length);
         // 重新追加全部7条
@@ -262,10 +307,16 @@ export default {
         // 双击监听，打开table页面，赋予特定选项
         const routeObj = this.$router.resolve({
           path: "/data/table",
-          query: {
-            name: this.tablename,
-            department: data.承办单位 ?? "",
-          },
+          query:
+            this.type === 1
+              ? {
+                  name: this.tablename,
+                  department: data.承办单位 ?? "",
+                }
+              : {
+                  name: this.tablename,
+                  source: data.线索来源 ?? "",
+                },
         });
         window.open(routeObj.href, "_blank");
       });
@@ -283,11 +334,17 @@ export default {
         .then((res) => {
           // 对res.list进行合并处理
           const obj = {};
-          this.departmentList.forEach((dept) => {
-            obj[dept] = [];
-          });
+          if (this.type === 1) {
+            this.departmentList.forEach((dept) => {
+              obj[dept] = [];
+            });
+          } else {
+            this.sourceList.forEach((dept) => {
+              obj[dept] = [];
+            });
+          }
           (res.list || []).forEach((item) => {
-            const key = item.承办单位;
+            const key = this.type === 1 ? item.承办单位 : item.线索来源;
             if (obj[key]) {
               obj[key].push(item);
             }
@@ -295,6 +352,7 @@ export default {
           let chartJsonJG = [];
           let chartJsonPZ = [];
           let chartJsonXZ = [];
+          let chartJsonXSLY = [];
           let importData = [];
           // 整理最终数据
           for (const key in obj) {
@@ -333,70 +391,38 @@ export default {
                   (el.第四种形态 - 0));
             }
             let depKey = key;
-            let item1 = {
-              承办单位: depKey,
-              value: complete,
-              type: "办结",
-            };
-            let item2 = {
-              承办单位: depKey,
-              value: element.length - complete,
-              type: "未办结",
-            };
-            let item3 = {
-              承办单位: depKey,
-              value: caseFiling,
-              type: "立案件数",
-            };
-            let item4 = {
-              承办单位: depKey,
-              value: caseFilingPeople,
-              type: "立案人数",
-            };
+            // 1. 定义基础数据配置，新增/删除类型直接在这里改
+            const baseList = [
+              { value: complete, type: "办结" },
+              { value: element.length - complete, type: "未办结" },
+              { value: caseFiling, type: "立案件数" },
+              { value: caseFilingPeople, type: "立案人数" },
+              { value: detain, type: "留置件数" },
+              { value: detainPeople, type: "留置人数" },
+              { value: discipline, type: "处理处分人数" },
+            ];
 
-            let item5 = {
-              承办单位: depKey,
-              value: detain,
-              type: "留置件数",
-            };
-            let item6 = {
-              承办单位: depKey,
-              value: detainPeople,
-              type: "留置人数",
-            };
-            let item7 = {
-              承办单位: depKey,
-              value: discipline,
-              type: "处理处分人数",
-            };
-            // 区分机关、派驻、乡镇
-            if (hasAnyWord(depKey, ["镇", "乡", "街道"])) {
-              chartJsonXZ.push(item1);
-              chartJsonXZ.push(item2);
-              chartJsonXZ.push(item3);
-              chartJsonXZ.push(item4);
-              chartJsonXZ.push(item5);
-              chartJsonXZ.push(item6);
-              chartJsonXZ.push(item7);
-            } else if (hasAnyWord(depKey, ["派驻"])) {
-              chartJsonPZ.push(item1);
-              chartJsonPZ.push(item2);
-              chartJsonPZ.push(item3);
-              chartJsonPZ.push(item4);
-              chartJsonPZ.push(item5);
-              chartJsonPZ.push(item6);
-              chartJsonPZ.push(item7);
+            // 2. 判断字段名，type===1 用承办单位，否则线索来源
+            const fieldKey = this.type === 1 ? "承办单位" : "线索来源";
+            const baseChartJson = baseList.map((item) => {
+              return {
+                ...item,
+                [fieldKey]: depKey,
+              };
+            });
+            if (this.type === 1) {
+              // 区分机关、派驻、乡镇
+              if (hasAnyWord(depKey, ["镇", "乡", "街道"])) {
+                chartJsonXZ = [...chartJsonXZ, ...baseChartJson];
+              } else if (hasAnyWord(depKey, ["派驻"])) {
+                chartJsonPZ = [...chartJsonPZ, ...baseChartJson];
+              } else {
+                chartJsonJG = [...chartJsonJG, ...baseChartJson];
+              }
             } else {
-              chartJsonJG.push(item1);
-              chartJsonJG.push(item2);
-              chartJsonJG.push(item3);
-              chartJsonJG.push(item4);
-              chartJsonJG.push(item5);
-              chartJsonJG.push(item6);
-              chartJsonJG.push(item7);
+              chartJsonXSLY = [...chartJsonXSLY, ...baseChartJson];
             }
-            importData.push({
-              承办单位: depKey,
+            let importDataObj = {
               办结: complete,
               未办结: element.length - complete,
               立案件数: caseFiling,
@@ -404,16 +430,26 @@ export default {
               留置件数: detain,
               留置人数: detainPeople,
               处理处分人数: discipline,
-            });
+            };
+            if (this.type === 1) {
+              importDataObj.承办单位 = depKey;
+            } else {
+              importDataObj.线索来源 = depKey;
+            }
+            importData.push(importDataObj);
           }
           this.importData = importData;
           this.obj = obj;
           this.total = res.total || 0;
           chartJsonJG = sortByChengbanDanwei(chartJsonJG);
           // 绘制图形
-          this.renderChart(chartJsonXZ, "xz");
-          this.renderChart(chartJsonPZ, "pz");
-          this.renderChart(chartJsonJG, "jg");
+          if (this.type === 1) {
+            this.renderChart(chartJsonXZ, "xz");
+            this.renderChart(chartJsonPZ, "pz");
+            this.renderChart(chartJsonJG, "jg");
+          } else {
+            this.renderChart(chartJsonXSLY, "xsly");
+          }
           this.loading = false;
         })
         .catch(() => {
@@ -433,8 +469,8 @@ export default {
           }
           if (field === "承办单位") {
             this.departmentList = res.options || [];
-            this.handleQueryTableData();
           }
+          this.handleQueryTableData();
         });
     },
   },

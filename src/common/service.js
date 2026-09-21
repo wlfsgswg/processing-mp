@@ -82,8 +82,8 @@ class HttpRequest {
   beforeRequest(requestOptions) {
     const data = Cookies.get();
 
-    if (window.location.pathname !== "/mp_jf_self/login" && !data.code) {
-      window.location.href = `${window.location.origin}/mp_jf_self/login`;
+    if (window.location.pathname !== "/#/login" && !data.code) {
+      window.location.href = `${window.location.origin}/#/login`;
       return;
     }
     this.transformLoadingStatus(requestOptions, true);

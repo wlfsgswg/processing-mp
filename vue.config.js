@@ -1,5 +1,5 @@
 module.exports = {
-  outputDir: "processing-dist", // 自定义的dist文件夹名
+  outputDir: "dist", // 自定义的dist文件夹名
   publicPath: "/",
   filenameHashing: true, // 启用文件名哈希
   indexPath: "index.html",
