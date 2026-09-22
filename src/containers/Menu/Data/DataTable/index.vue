@@ -4,7 +4,10 @@
       <Title title="数据列表"></Title>
     </div>
     <div class="p-b-20 data-department" v-if="!isShowSearch">
-      <div>承办单位：{{ query.department }}</div>
+      <div>
+        {{ query.department ? "承办单位：" : "线索来源："
+        }}{{ query.department ? query.department : query.source }}
+      </div>
       <div>
         总计：<span class="red p-r-5"> {{ total }} </span>件，已办结：<span
           class="red p-r-5"
@@ -308,6 +311,7 @@ export default {
     // 判断跳转过来
     isShowSearch: true,
     query: {
+      source: "",
       department: "",
       type: "",
       value: "",
@@ -330,14 +334,22 @@ export default {
   },
   mounted() {
     // 获取参数名字
-    let { name, department } = this.$route.query;
+    let { name, department, source } = this.$route.query;
     this.tablename = name;
-    if (department) {
+    if (department || source) {
       this.query.department = department;
-      this.search.承办单位 = department;
+      this.query.source = source;
       this.page.pageSize = 50;
       this.isShowSearch = false;
-      this.keys = ["承办单位"];
+
+      if (department) {
+        this.search.承办单位 = department;
+        this.keys = ["承办单位"];
+      }
+      if (source) {
+        this.search.线索来源 = source;
+        this.keys = ["线索来源"];
+      }
     } else {
       this.handleQueryDistinctField("线索来源");
       this.handleQueryDistinctField("承办单位");
@@ -347,13 +359,14 @@ export default {
   _methods: {
     // 跳转到数据展示页面
     handleSkip(type) {
-      this.$router.push({
+      const routeObj = this.$router.resolve({
         path: "/data/charts",
         query: {
           name: this.tablename,
           type,
         },
       });
+      window.open(routeObj.href, "_blank");
     },
     handleCheckedCitiesChange() {
       const tableColumns = [];
