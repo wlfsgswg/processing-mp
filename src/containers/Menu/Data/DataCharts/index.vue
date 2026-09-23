@@ -228,6 +228,7 @@ export default {
         interaction: {
           tooltip: {
             shared: true,
+            bounding: "viewport", // 使用整个浏览器视窗作为tooltip边界，不再被图表框限制
           },
         },
         tooltip: {
@@ -258,10 +259,27 @@ export default {
         },
         axis: {
           x: {
-            labelTransform: "rotate(-70)",
-            labelTextAlign: "right",
-            labelSpacing: 12,
             labelFontSize: 11,
+            labelSpacing: 14,
+            // 自动角度策略：优先0°水平；放不下自动切-70°倾斜
+            labelAutoRotate: {
+              optionalAngles: [0, -70],
+              recoverWhenFailed: true,
+            },
+            // 自动换行，最多2行
+            labelAutoWrap: {
+              maxLines: 2,
+              wordWrapWidth: 110,
+            },
+            // 超过30字截断加省略号（兜底）
+            labelFormatter: (text) => {
+              if (!text) return text;
+              const maxTotal = 30;
+              if (text.length > maxTotal) {
+                return text.slice(0, maxTotal) + "...";
+              }
+              return text;
+            },
           },
           y: {
             title: { text: "数量" },
@@ -269,7 +287,6 @@ export default {
         },
       });
       chart.render();
-
       chart.on("tooltip:change", (ev) => {
         const orgName = ev.items[0].data[field];
         const allRows = chartJson.filter((d) => d[field] === orgName);
