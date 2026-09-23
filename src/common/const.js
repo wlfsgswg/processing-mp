@@ -103,9 +103,9 @@ const headerBasicCell = [
   // "主要被反映人单位及职务",
   // "主要被反映人职级",
   "主要问题摘要",
-  // "归属全国性重点整治项目情况",
-  // "归属全国性重大民生实事情况",
-  // "归属省级重点整治项目情况",
+  "归属全国性重点整治项目情况",
+  "归属全国性重大民生实事情况",
+  "归属省级重点整治项目情况",
   // "初次处置方式",
   "初次处置日期",
   "是否立案",
@@ -116,7 +116,7 @@ const headerBasicCell = [
   // "留置人数",
   // "反映问题是否属实",
   "是否查结",
-  // "备注",
+  "备注",
   "承办单位",
   "办结日期",
   "办理结果100字以内简要填写处理处分情况",
@@ -127,8 +127,51 @@ const headerBasicCellScope = [
   "立案日期",
   "办结日期",
 ];
+
+const fieldTypes = [
+  {
+    type: 1,
+    field: "承办单位",
+  },
+  {
+    type: 2,
+    field: "线索来源",
+  },
+  {
+    type: 3,
+    field: "归属全国性重点整治项目情况",
+  },
+  {
+    type: 4,
+    field: "归属全国性重大民生实事情况",
+  },
+  {
+    type: 5,
+    field: "归属省级重点整治项目情况",
+  },
+  {
+    type: 6,
+    field: "备注",
+  },
+];
+
+// 根据type读取配置，兜底防止找不到
+const getFieldConfig = (type) => {
+  const findItem = fieldTypes.find((item) => item.type === type);
+  if (findItem) {
+    return findItem;
+  }
+  // 兜底，找不到返回默认
+  return {
+    type: this.type,
+    field: "",
+    label: "未知字段",
+  };
+};
 export {
   grades,
+  fieldTypes,
+  getFieldConfig,
   pickerOptions,
   fromValueGetName,
   accountList,

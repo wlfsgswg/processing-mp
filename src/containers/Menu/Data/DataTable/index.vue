@@ -1,13 +1,14 @@
 <template>
   <div class="xcx-data-datatable">
     <div class="p-b-20">
-      <Title title="数据列表"></Title>
+      <Title
+        title="数据列表"
+        :skipTitle="fieldConfig.type ? '返回' : ''"
+        @onskip="handleBack"
+      ></Title>
     </div>
     <div class="p-b-20 data-department" v-if="!isShowSearch">
-      <div>
-        {{ query.department ? "承办单位：" : "线索来源："
-        }}{{ query.department ? query.department : query.source }}
-      </div>
+      <div>{{ fieldConfig.field }}：{{ fieldConfig.value }}</div>
       <div>
         总计：<span class="red p-r-5"> {{ total }} </span>件，已办结：<span
           class="red p-r-5"
@@ -144,14 +145,25 @@
         >
       </div>
       <div class="r-right" v-if="isShowSearch">
-        <el-button type="primary" size="small" @click="handleSkip(2)">
-          以线索来源展示数据</el-button
-        >
+        <el-button type="primary" size="small" @click="handleSkip">
+          图表展示
+        </el-button>
       </div>
       <div class="r-right p-r-20" v-if="isShowSearch">
-        <el-button type="primary" size="small" @click="handleSkip(1)">
-          以承办单位展示数据</el-button
+        <el-select
+          filterable
+          v-model="selectType"
+          placeholder="请选择展示方式"
+          size="small"
+          :style="{ width: '100%' }"
         >
+          <el-option
+            v-for="it in fieldTypes"
+            :label="it.field"
+            :value="it.type"
+            :key="it.type"
+          ></el-option>
+        </el-select>
       </div>
     </div>
     <div :class="`xcx-components-table`" v-if="tableColumns.length">
@@ -280,7 +292,12 @@
 <script>
 import "./index.less";
 import { Title, Dialog } from "@/components";
-import { headerBasicCell, headerBasicCellScope } from "@/common/const";
+import {
+  headerBasicCell,
+  headerBasicCellScope,
+  getFieldConfig,
+  fieldTypes,
+} from "@/common/const";
 import { checkSixMonth, checkTwelveMonth, createNewXlsx } from "@/common/utils";
 import { mapState } from "vuex";
 
@@ -311,10 +328,6 @@ export default {
     // 判断跳转过来
     isShowSearch: true,
     query: {
-      source: "",
-      department: "",
-      type: "",
-      value: "",
       // 办结
       complete: "",
       // 立案
@@ -327,46 +340,46 @@ export default {
       // 留置人数
       detainPeople: "",
     },
+    selectType: 1,
+    fieldTypes,
+    fieldConfig: {},
   }),
   components: {
     Title,
     Dialog,
   },
   mounted() {
-    // 获取参数名字
-    let { name, department, source } = this.$route.query;
+    // 兜底，如果$route不存在，给空对象
+    const query = this.$route?.query || {};
+    let { name, type, value } = query;
     this.tablename = name;
-    if (department || source) {
-      this.query.department = department;
-      this.query.source = source;
-      this.page.pageSize = 50;
+    if (type) {
+      this.fieldConfig = getFieldConfig(type - 0);
+      this.fieldConfig.value = value;
+      this.page.pageSize = 100;
       this.isShowSearch = false;
-
-      if (department) {
-        this.search.承办单位 = department;
-        this.keys = ["承办单位"];
-      }
-      if (source) {
-        this.search.线索来源 = source;
-        this.keys = ["线索来源"];
-      }
+      this.search[this.fieldConfig.field] = value;
+      this.keys = [this.fieldConfig.field];
     } else {
       this.handleQueryDistinctField("线索来源");
       this.handleQueryDistinctField("承办单位");
     }
     this.handleQueryTableData();
   },
-  _methods: {
+  methods: {
+    // 返回
+    handleBack() {
+      this.$router.back();
+    },
     // 跳转到数据展示页面
-    handleSkip(type) {
-      const routeObj = this.$router.resolve({
+    handleSkip() {
+      this.$router.push({
         path: "/data/charts",
         query: {
           name: this.tablename,
-          type,
+          type: this.selectType,
         },
       });
-      window.open(routeObj.href, "_blank");
     },
     handleCheckedCitiesChange() {
       const tableColumns = [];
@@ -521,12 +534,6 @@ export default {
       this.page.pageNum = val;
       this.handleQueryTableData();
     },
-  },
-  get methods() {
-    return this._methods;
-  },
-  set methods(value) {
-    this._methods = value;
   },
   computed: {
     ...mapState("global", ["globalInfo", "userInfo"]),
